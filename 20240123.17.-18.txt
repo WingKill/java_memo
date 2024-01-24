@@ -1,0 +1,126 @@
+20240123 17장 인터페이스와 추상클래스 -18장 예외처리
+
+인터페이스 
+
+---
+한 클래스에 상속과 구현이 동시에 가능하다.
+---
+자바에서 말하는 예외
+- exception : 실행 중간에 발생하는 비정상적 상황(문법 오류 X)
+- 공식적인 용어이다. 
+
+에러는 수습 불가능한 심각한 문제를 얘기한다. 에러는 대처하기 힘들다. 예상하여 방지해야 한다.
+예외는 에러 없는 환경에서도 발생할 수 있다. 실행 환경을 방해하는 상황. 미연에 해당 상황을 방지할 수 있다.
+예외에 대한 처리 방법은 프로그래머가 결정할 수 있다.
+---
+자바 에러 메세지 나오는 기본 매커니즘(처리 사항)
+-> 해당 에러 메세지를 뿌리는 주체는 JVM이다.
+-> 예외사항에 해당되는 예외 객체를 알려준다.
+-> 프로그램 실행 후 예외 사항을 만나면, 해당되는 예외 객체를 만나고 예외 문구를 뿌려준다.
+(어떤 함수를 호출했는지 알려준다.) 이후 죽는다.(실행을 멈춘다.)
+---
+try catch finally문을 통해서 예외 처리를 할 수 있다.
+이 문구는 모든 객체 지향 언어에서 지원한다.
+예외 처리를 하면, 예외 발생한 부분에서 프로그램 실행을 강제로 멈추지 않는다.
+---
+try catch문은 프로그램의 안정성을 위해 필요하다.
+---
+JVM은 에러 발생 지점에서 예외 객체를 실행시킨다.
+try catch문이 없으면 그 자리에서 프로그램을 멈춘다.
+try catch가 있으면 catch문들 중 해당 객체를 담는 catch문을 찾아 그 객체를 대입한다.
+---
+catch(객체){
+	실행문구
+}
+---
+개발자들이 기본적으로 짜게 되는 catch문의 실행문구 예시.
+catch (ArithmeticException e) {
+	e.printStackTrace();
+	System.out.println(e.getMessage());
+}
+---
+try catch문에서, catch문의 개수는 제약이 없다.
+---
+catch (ArithmeticException | InputMismatchException e) { // 예외 : 0으로 나눌 때
+	e.printStackTrace();
+	System.out.println(e.getMessage());
+}
+
+클래스 or 클래스 : 클래스 | 클래스
+---
+코드가 길어지고, 다른 외부 클래스를 끌고 오면 그만큼 오류의 개수가 늘어날 수 있다.
+모든 객체를 알 수도 없고, JVM이 예외 발생 시 어떤 객체를 올릴지는 알 수 없다.
+-> 모든 예외 객체의 부모인 Exception을 활용하여 에러 메세지를 표현
+---
+예외 처리에서도 다형성이 적용된다.
+---
+try 구문은, 구문 내 예외 발생 시점 이후로는 다시 타지 않는다. 
+try -> 예외 발생 -> catch 
+---
+java program -> JVM 
+OS 의 목적 
+- 응용 어플리케이션을 구동시키는 것
+JVM이 OS의 역할을 해주기 때문에, OS에 대한 이해도가 있어야 이해하기 쉽다.
+---
+JVM은 메모리 관리를 한다.
+Method Area 
+CallStack
+Heap
+
+Java 예외 상황 발생 시 CallStack을 보여준다.
+해당 CallStack 경로 순서 : 실행 순서와 반대. 
+---
+java.lang.ArithmeticException: / by zero
+Good bye
+	at ExceptionMain.md2(ExceptionMain.java:34)
+	at ExceptionMain.md1(ExceptionMain.java:30)
+	at ExceptionMain.main(ExceptionMain.java:22)
+이 경우 md2에서 에러가 발생했고 이 에러가 md1, main 순으로 넘어왔음을 알 수 있다.
+에러 발생 : md2 -> md1 -> main 
+실행 순서 : main -> md1 -> md2
+---
+Throwable : java에서 모든 오류와 예외의 슈퍼 클래스. 
+Exception : 예외만.
+---
+자주 겪게 되는 에러
+- ArrayIndexOutOfBoundsException : 인덱스 값을 초과
+- ClassCastException : 참조형 형변환 에러 - 상속 관계 간 형변환이 제대로 이루어지지 않는 경우 발생
+- NullPointerException : 실제 값이 아닌 null을 가지고 있는 객체/변수를 호출할 때 발생
+---
+Checked Exception / UnChecked Exception
+Checked Exception 
+- 예외 처리 강제됨. 
+- 코드 작성 시 예외 처리 코드 추가해야 함.
+- 이러한 예외는 Throwable 클래스를 상속받지만 RuntimeException 클래스를 상속받지 않는다고 한다. 
+UnChecked Exception 
+- 예외 처리가 강제되지 않음.
+---
+기존 자바 개발자들이 exception 객체를 분리해놨다.
+---
+throws 키워드 
+- 메소드나 생성자에서 발생할 수 있는 예외를 명시적으로 선언하는 키워드
+- 메소드 선언부에서 사용됨.
+- 여러 예외를 선언할 때는 쉼표로 구분하여 나열할 수 있다.
+public void exampleMethod() throws SomeException {
+    // 메소드의 로직
+    // SomeException이 발생할 수 있음
+}
+---
+throws 키워드 : 언제? 누구에게? 예외 발생했을 때, 생성한 예외 객체를 호출한 놈에게 전달한다는 것.
+try catch문이 있는지 없는지 보고, 호출한 놈에게 없으면 jvm이 자체적으로 처리해버린다. 프로그램이 중간에 끝나버림.
+throw 키워드 사용 시, 호출부에서 Checked exception은 강제로 예외처리를 하라며 컴파일 에러를 일으킨다.
+throw 키워드 사용 시, 호출부에서 unchecked exception은 강제로 컴파일 에러를 일으키진 않는다. 
+---
+public static void main(String[] args) throws Exception
+- JVM에게 main함수에서 나오는 예외 객체를 주겠다.
+- try catch 안하고 JVM 니가 알아서 해결하줘. 
+- 에러 메세지 뜨면서 프로그램은 실행된다. 이게 뭔...
+---
+메인 함수 내 에러 해결 방식이 2가지다. 
+- throw 키워드를 통해 에러를 jvm에게 던지기
+- 예외처리문을 사용하기
+---
+서버 프로그래밍은 예외처리가 상당히 중요. 
+---
+자바 스크립트나 파이썬은 반드시 예외처리를 해야 한다는 개념이 없다고.
+---
