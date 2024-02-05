@@ -1,0 +1,265 @@
+20240205 데이터베이스1
+
+SCOTT - tiger 
+데이터베이스에서는 예제로 유명하다고.
+---
+교재로 사용되는 사이트 링크
+https://wikidocs.net/3915
+---
+데이터베이스
+- 데이터 : 정보 단위
+- 데이터베이스 : 데이터 집합. 검색 가능, 수정, 삭제 가능.
+
+---
+오라클 : DBMS회사(자바 라이센스)
+---
+DBMS(DataBase Management System) : 데이터베이스 관리 시스템
+- 소프트웨어.
+- 데이터베이스를 관리하는, 검색 기능 제공하는 시스템 소프트웨어
+- 1980년도에 처음 오라클이 나옴.
+- RDBMS : Relational Database Management System - 관계형 데이터베이스 관리 시스템
+---
+오라클 회사는 
+- Oracle
+- MYSQL
+- java
+를 인수한 상태.
+---
+빅데이터 시대가 오면서, RDBMS의 영향력이 조금씩 줄어들고 있다고.
+---
+개발자들이 다루는 건 sql로 정해져 있다.
+해당 부분은 DBMS의 영향을 크게 받지 않는다고.
+sql 트레이닝을 하는 거라고.
+---
+DBMS가 나오기 전까지는, 메모장에 저장을 시켰었다고 한다.
+이런 저장 방식을 파일 시스템이라고 한다.
+데이터베이스는, 해당 파일 시스템의 문제점이 제기되면서 등장한 것
+---
+일일히 부서마다 동일한 데이터를 저장해놓는 방식보다는,
+중앙에 파일 하나 두고, 꺼내오는 방식이 훨 낫다고 판단.
+---
+동기화 - 내가 작업하는 동안, 다른 사람이 접근하지 못하게 하는 것.
+보안 - 데이터 접근 제한을 두는 것
+--- 
+래리 앨리슨 - 오라클의 공동 설립자, 이사회 의장
+---
+RDBMS에서 R(relation)의 의미
+- excel
+- 정보를 저장하기 위한 구조를 위해, 2차원 테이블을 사용
+- 각 테이블은 행(column)과 열(row)로 이루어져있고, 테이블 간에 관계를 맺을 수 있음.
+- 관계는 주로 key 를 사용하여 정의.
+---
+RDBMS는 많은 사용 사례에 적합하다고.
+---
+챗 gpt 검색 결과, 모든 데이터 관리 문제에 RDBMS를 쓰는 정도는 아니라고. 
+---
+오라클(DBMS)이 눈에 안보이지만, 계속 돌아가고 있다.
+챗 서버도 소켓 프로그램이다.
+DBMS도 소켓으로 받고 있다고.
+명령어를 주게 되면, 해당 명령어를 통해(해석하여) 데이터 파일들을 처리.
+--- 
+명령어를 sql이라 표현한다. 
+sql(Structured Query Language) 
+- 관계형 데이터베이스에서, 데이터를 관리하고 검색하기 위해 사용되는 표준화된 프로그래밍 언어.
+---
+sql 부분은, 언제 어디서든 다 쓰이기 때문에 그날그날 다 외워주는 식으로 진행해보자.
+미리 배운 부분들이 있기 때문에, 문법적인 요소는 금방 익숙해질 것이라고.
+---
+scott에서는 트레이닝 테이블을 제공한다.
+---
+오라클도, 컬럼에 대해서 각각의 데이터 타입이 있다. 
+이와 같은 명령어는 아래와 같고, 이 과정을  아래와 같은 말로 표현한다.
+-- 테이블 구조를 확인한다. -- 
+desc dept;
+---
+-- 테이블에 저장된 데이터를 조회하기 위한 명령어이다. -- 
+SELECT * FROM dept;
+---
+진도 다 나가면 50문제 풀게 할 것이다.
+---
+벤처가면 오라클 짜게 된다고...
+---
+sql문에서, if를 대신하는 명령어가 where라고
+---
+- 문자, 날짜는 반드시 홑따옴표(')(단일 따옴표) 안에 표시해야 한다.
+---
+각각 언어를 배울 때, 데이터 타입을 먼저 체크해줘야 한다.
+그래서 책에서도 항상 데이터 타입부터 언급하게 되는 것.
+---
+DB는 데이터 타입을 3가지만 가진다.
+- 문자
+- 숫자
+	- 정수 : 2의 보수법
+	- 실수 : 오차가 발생할 수밖에 없음
+- 날짜
+---
+'' 안에 있는 내용은 대소문자를 가린다.
+---
+날짜 표시 방식
+```
+SELECT * from emp where hiredate >= '1982/01/01';
+```
+년도/월/일 방식으로 표현 
+또는
+```
+SELECT * from emp where hiredate >= '1982.01.01';
+```
+년도.월.일 방식으로 표현
+---
+```
+SELECT * from emp where deptno != 20;
+SELECT * from emp where deptno <> 20;
+SELECT * from emp where deptno ^= 20;
+SELECT * from emp where not deptno = 20;
+```
+deptno가 20이 아닌 데이터를 찾을 때 사용하는 문법.
+다르다는 표현이 많다.
+---
+조건을 2개 이상 붙일 땐 and 를 사용한다.
+```
+SELECT * from emp where deptno = 10 and job = 'MANAGER';
+```
+---
+월급이 2000 이상 3000 이하인 사원 구하기.
+```
+select * from emp where sal <= 3000 and sal >= 2000;
+select * from emp where sal BETWEEN 2000 and 3000;
+```
+보통 DB에서는 between 키워드를 많이 사용한다.
+---
+월급이 2000 미만, 혹은 3000초과인 사원 구하기
+```
+select * from emp where sal > 3000 or sal < 2000;
+select * from emp where sal not BETWEEN 2000 and 3000;
+```
+---
+81년도에 입사한 사람, 81년도에 입사하지 않은 사람 찾기
+```
+select * from emp where hiredate between '1981.01.01' and '1981.12.31';
+select * from emp where hiredate not between '1981.01.01' and '1981.12.31';
+```
+between은 날짜 조건으로 뽑아내야 할 때 유용하다.
+---
+2개 이상 or가 오는 명령어의 경우에는 in을 사용한다.
+```
+SELECT * fROM emp where comm = 300 or comm = 500 or comm = 1400;
+select * from emp where comm in(300,500,1400);
+```
+---
+like : ~와 같다.
+
+```
+select * from emp where ename like 'F%';
+```
+이름이 F로 시작하는 모든 사원 출력. 
+```
+select * from emp where ename like '%A%';
+```
+이름에 A가 들어가는 모든 사원 출력
+```
+select * from emp where ename like '%N';
+```
+이름이 N으로 끝나는 모든 사원 출력
+---
+와일드 카드 : % , _
+
+% : 어떤 문자가 몇개가 오던지 상관없다는 의미이다.
+_ : 어떤 문자이든, 반드시 1개만 와야 한다는 의미이다.
+---
+
+이름의 두 번째 글자가 A인 모든 사원 출력
+```
+select * from emp where ename like '_A%';
+```
+---
+프로그래밍에서는 객체에서만 null이 허용됐다.
+sql에서는 모두 null을 허용할 수 있다.
+- sql의 데이터 타입은 전부 객체라... 가능한 것...
+null에 대한 개념을 모르면 sql 전체를 망쳐버린다.
+- null은 is 로 컨트롤한다.
+---
+```
+select * from emp WHERE comm is not null;
+select * from emp WHERE comm is null;
+```
+---
+정렬(order by)
+- 오름차순 : ascending  ASC  ex) 1 2 3 4 5 ...
+- 내림차순 : descending  DESC ex) 10 9 8 7 6 ...
+기본적으로 오름차순 설정이다.
+```
+SELECT * from emp ORDER BY sal asc;
+SELECT * from emp ORDER BY sal;
+SELECT * from emp ORDER BY sal desc;
+```
+---
+오름차순 
+- 숫자 : 작은 값부터
+- 문자 : 사전 순서대로
+- 날짜 : 빠른 날짜 순
+- null : 가장 마지막에 나옴
+
+내림차순
+- 숫자 : 큰 값부터
+- 문자 : 사전 순서 반대대로
+- 날짜 : 늦은 날짜 순
+- null : 가장 먼저 나옴
+---
+```
+select * from emp where deptno = 30 order by sal DESC;
+```
+조건으로 먼저 쳐내고, 정렬을 하는 것.
+반대로 할 경우 오류가 발생한다.
+```
+ORA-00933: SQL command not properly ended
+00933. 00000 -  "SQL command not properly ended"
+*Cause:    
+*Action:
+104행, 38열에서 오류 발생
+```
+---
+```
+SELECT * FROM emp order by ename, sal ;
+```
+먼저 ename을 오름차순으로 정렬하고, 
+이후 데이터는 중복 데이터들에 한해 sal을 오름차순으로 정렬
+현업에서 자주 이런 식으로 사용한다고.
+조금만 명령문이 길어져도 헷갈리는 사람이 많다고 한다.
+---
+현업에서는, table의 column들이 어마어마하게 많아서 문제라고.
+---
+DB를 기존에 다루던 사람들 외에는 테이블 데이터를 건드는 걸 잘 안 건드리게 함.
+현업에서는 delete를 잘 안함.
+그래서 거의 이런 문제는, 소통에서 문제가 발생하여 이뤄지는 경우가 많다고.
+---
+```
+SELECT DISTINCT deptno FROM  emp;
+```
+컬럼 내 중복 데이터 제거하여 데이터를 보여줌.
+자바로 생각하면, set으로 구현되어 있다고 보면 된다.
+---
+자바에서 배운 지식과 연결되어 생각해보면, sql문을 확실히 빨리 뽑아낼 것이다.
+---
+alias : 별칭
+컬럼 이름으로 의미를 알아 보기 힘든 경우 컬럼의 이름에 별칭을 부여할 수 있다.
+```
+select ename as "이름" from emp;
+```
+"" 로 이름을 구분하며, 빈칸이 없을 때는 ""를 사용하지 않아도 된다.
+단, 컬럼명에 빈칸을 넣고 싶다면 ""으로 이름 부분을 구분해줘야 한다.
+---
+```
+select ename, sal*12 from emp;
+```
+사원명, 사원의 연봉(월급*12)을 구하는 것. 대신, 컬럼명이 sal*12 그대로 나옴.
+```
+select ename, sal*12 as "연봉" from emp;
+```
+해당 상황일 때 별칭을 정해주는 것이 좋다.
+---
+연결 연산자 : 두 컬럼 내 데이터를 연결하여 표현하고자 할 때 사용
+```
+SELECT ename ||' is a '|| job "연결" from emp;
+```
+컬럼명은 연결, 데이터들의 값은 'ename 내 데이터' is a 'job 내 데이터' 로 표시된다.
+---
