@@ -1,0 +1,207 @@
+20240206 데이터베이스
+
+---
+desc : description 묘사
+desc emp;
+--emp의 테이블 구조를 본다는 것.
+---
+면접 볼 때 공부했던 방식을 얘기하라.
+--- 
+SQL에서 사용되는 함수는 2가지가 있다.
+- 단일행 함수 : 여러건의 데이터를 한번에 하나씩만 처리하는 함수이다
+- 복수행 함수 : 여러건의 데이터를 동시에 입력 받아서 결과값 한 건을 만들어 주는 함수이다. 
+복수행 함수는 그룹함수라고도 한다.
+---
+dual 테이블
+- sql에서 기본적으로 제공하는 테이블
+- 한 행으로 결과를 출력하기 위한 테이블
+- 산술 연산이나 가상 컬럼 등의 값을 한번만 출력하고 싶을 때 많이 사용한다.
+---
+	산술 함수
+---
+- ABS : 절대값 구하는 함수. 0에서 해당 수와의 거리를 절대값이라 표현.
+SELECT - 10,  abs(-10) from dual;
+- FLOOR : 어떤 프로그래밍 언어에서든 전부 지원하는 함수라고 한다. 
+	- 소수점 이하를 버리는 함수이다.
+select 34.5432, floor(34.5432) from dual;
+- ROUND : 특정 자릿수에서 반올림하는 함수
+	- default로 소수점 첫째 자리에서 반올림한다.
+select 34.5432, round(34.5432,2) from dual;
+- 소수점 두번째 자리까지 나타내라, 소수점 셋째 자리에서 반올림하라.
+select 34.5678, round(34.5678,-1) from dual;
+	- 일의 자리에서 반올림하라.
+- TRUNC : 특정 자릿수에서 잘라내는 함수. 버리는 함수
+SELECT TRUNC(34.5678, 2), TRUNC(34.5678, -1), TRUNC(34.5678), TRUNC(34.5678, 0) FROM DUAL;
+	- 소수점 2번째 자리까지 나타내라.
+	- 일의 자리에서부터 나머지 숫자들을 버려라.
+- MOD : 나머지 돌려받는 함수
+SELECT MOD(27, 2), MOD(27, 5), MOD(27, 7) FROM DUAL;
+	- 각각 1, 2, 6이 남아 해당 수를 돌려받는다.
+---
+	문자 처리 함수
+---
+- UPPER : 소문자를 대문자로 변환하는 함수
+SELECT 'Welcome to Oracle' "적용전", UPPER('Welcome to Oracle') "UPPER적용후" FROM DUAL;
+	- dual에서는, column명이 데이터와 똑같이 들어가기 때문에 별명을 만들어주는 것이다.
+	- 적용하면 Welcome to Oracle이 WELCOME TO ORACLE으로 변환된다.
+- LOWER : 대문자를 소문자로 변환하는 함수
+SELECT 'Welcome to Oracle' "적용전", LOWER('Welcome to Oracle') "LOWER적용후" FROM DUAL;
+	- 적용하면 Welcome to Oracle이 welcome to oracle으로 변환된다.
+- INITCAP : initialize capital의 약자. 이니셜만 대문자로 변환하는 함수이다.
+SELECT 'WELCOME TO ORACLE' "적용전", INITCAP('WELCOME TO ORACLE') "INITCAP적용후" FROM DUAL;
+	- 적용하면 WELCOME TO ORACLE이 Welcome to Oracle으로 변환된다.
+- LENGTH : 문자 길이를 구하는 함수
+SELECT LENGTH('Oracle'), LENGTH('오라클') FROM DUAL;
+	- 각각 6, 3을 리턴한다.
+- LENGTHB : 바이트 수를 알려주는 함수
+SELECT LENGTHB('Oracle'), LENGTHB('오라클') FROM DUAL;
+	- 각각 6, 9를 리턴한다. 
+	- sql에서 영어는 글자 당 1바이트, 한글은 글자 당 3바이트를 차지한다.
+- INSTR : 특정 문자의 위치를 알려주는 함수
+SELECT INSTR('Welcome To Oracle', 'W') FROM DUAL;
+	- sql은 사용자 친화적이라, 보통 0부터 인덱스를 두는 다른 프로그래밍 언어와 달리
+	해당 함수에서는 1을 리턴해준다.
+SELECT INSTR('Welcome To Oracle', 'O') FROM DUAL;
+	- 해당 상황에서는 12를 리턴한다.
+- SUBSTR : 대상 문자열이나 컬럼의 자료에서 시작 위치부터 선택 개수만큼의 문자를 추출
+	- java의 substring은 시작 위치부터 마지막 위치까지 출력하는 함수지만, 
+	sql의 SUBSTR은 시작 위치부터 해당 개수만큼 출력하는 함수이다.
+SELECT SUBSTR ('Welcome to Oracle', 4, 3) FROM DUAL;
+	- com을 출력한다.
+- LPAD : 특정 기호로 채우는 함수 : 오른쪽 정렬 후 생긴 왼쪽의 빈 공백에 특정 문자를 채우는 함수
+SELECT LPAD('ORACLE', 20, '#') FROM DUAL;
+	- ##############ORACLE을 출력
+SELECT LPAD('ORACLE', 20) FROM DUAL;
+	-               ORACLE을 출력한다. 
+	- default로 빈칸으로 설정되어 있다는 뜻.
+- RPAD : 특정 기호로 채우는 함수 : 왼쪽 정렬 후 생긴 오른쪽의 빈 공백에 특정 문자를 채우는 함수
+	- 마찬가지로 default로 빈칸으로 설정되어 있다. 사용 방법은 LPAD와 같다.
+
+- LTRIM/RTRIM : 공백 문자를 제거하는 함수
+	- LTRIM : 왼쪽 공백 제거
+	- RTRIM : 오른쪽 공백 제거
+- TRIM : 특정 문자를 잘라내는 함수. 
+	- 기본적으로는 양쪽에 있는 공백을 제거할 수 있다.
+	- 사용 빈도가 좀 있음.
+SELECT TRIM('a' FROM 'aaaaORACLEaaaaa') FROM DUAL;
+	- ORACLE로 출력된다.
+SELECT TRIM(' ORACLE ') FROM DUAL;
+	- ORACLE로 출력된다.
+---	
+날짜 함수
+---
+- SYSDATE : 현재 날짜를 반환하는 함수
+- ADD_MONTHS : 특정 개월 수를 더한 날짜를 구하는 함수
+SELECT ENAME, HIREDATE, ADD_MONTHS(HIREDATE, 4) FROM EMP;
+	- 4개월을 더한 날짜를 리턴.
+- MONTHS_BETWEEN : 두 날짜 사이의 개월수를 구하는 함수 
+SELECT ENAME, SYSDATE, HIREDATE, MONTHS_BETWEEN(SYSDATE, HIREDATE) 근무개월수 FROM EMP;
+	- 개월수를 그대로 표현
+SELECT ENAME, SYSDATE, HIREDATE, trunc(MONTHS_BETWEEN(SYSDATE, HIREDATE))  근무개월수 FROM EMP;
+	- 개월수가 표현된 수의 소수점 내림.
+- LAST_DAY : 해당 달의 마지막 날짜를 반환하는 함수. 매개변수로 날짜형 타입이 들어와야 한다.
+select sysdate, last_day(sysdate) 막날 from dual;
+	- 2월달이라 2월 29일이 출력됐다.
+---
+sql에서 데이터 타입을 나누는 기준
+- 연산 방법이 데이터마다 다르기 때문이다.
+- 숫자는 10진법, 날짜는 60진법, 문자는 ASCII Code 테이블을 활용한다고 하는데
+정보가 잘 없으니 우선 그런가보다... 해야 하나...?
+---
+형 변환 함수
+---
+- TO_CHAR : 문자로 변환하는 함수
+SELECT SYSDATE, TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:ss') FROM DUAL;
+	- 현재 시간을 모두 표현하는 쿼리문
+	- 연도, 월, 일, 시, 분, 초를 표현할 수 있다.
+- TO_DATE : 문자를 date 타입으로 변환하는 함수
+select trunc(sysdate - to_date('2016/01/01','YYYY/MM/DD'))||'일' from dual;
+	- 올해 며칠이 지났는지 현재 날짜에서 2016/01/01을 뺀 결과를 출력하는 쿼리문
+	- 해당 쿼리문에서, 'YYYYMMDD'로 표현하면 에러가 발생한다. 
+	-> 아마, 앞의 데이터를 date 타입으로 취급해서 그런 게 아닐까 하는 생각이 든다.
+	-> 앞의 데이터를 문자로 취급하도록 구분하는 것 같다. 
+- TO_NUMBER : 문자를 숫자로 변환하는 함수
+SELECT TO_NUMBER('20,000', '99,999')-TO_NUMBER('10,000', '99,999') FROM DUAL;
+	- 20,000 에서 10,000 을 뺀 값을 구하는 쿼리문
+---
+sql에서 대부분 헷갈려하는 데이터 타입은 date 형이다.
+- sql에서 기본적으로 출력되는 방식은 YY/MM/DD 방식으로 표현
+---
+- NVL : null value의 약자. 만약에 컬럼 내 데이터가 null이 있으면, null을 다른 데이터로 취급시키기 위한 함수
+- 중요한 함수이자, 사용빈도가 높은 함수이다.
+select ename 사원, (sal*12) + comm 월급 from emp;
+	- null이 포함된 경우, null로만 출력된다.
+select ename 사원, (sal*12) + NVL(comm,0) 월급 from emp;
+	- null인 값은 0으로 취급하기 때문에 모두 숫자로 나온다.
+---
+- DECODE : switch case 문과 같은 기능이라고 한다.
+- 여러가지 경우에 대해 선택할 수 있도록 하는 함수
+select deptno, DECODE(deptno,10,'A',20,'B','default') from emp ORDER by deptno;
+	- decode(column명,데이터값1,치환데이터값1,데이터값2,치환데이터값2,나머지)
+	- deptno의 값이 10이면 A, 20이면 B, 나머지는 default로 출력한다.
+---
+- CASE : else if문과 같은 기능이라고 한다.
+- 조건에 따라 다른 처리가 가능한 함수
+select 
+    ename, deptno,
+        case when deptno = 10 then 'ACCOUNTING'
+              when deptno = 20 then 'RESEARCH'
+              when deptno = 30 then 'SALES'
+        end 부서
+from emp;
+	- deptno의 값이 10이면 ACCOUNTING, 20이면 RESEARCH, 30이면 SALES로 출력한다.
+---
+sql에서의 데이터 처리는 자바로 가져와서 하는 것보다, sql에서 처리하는 게 좋다.
+속도도 더 빠르다.
+oracle의 검색 속도 및 보안은 따라잡기가 매우 힘들기도 하다.
+데이터가 많아지면 자바로 가져와서 처리하는 것도 굉장히 힘들다.
+---
+그룹 함수
+-  sql 복수형 함수 : 그룹 함수
+---
+단일 함수와 복수형 함수의 차이
+- 단일행 함수 : 각각의 행에 대해 값을 구하는 함수
+- 복수형(그룹) 함수 : 모든 행에 대해 값을 구하는 함수
+	- 기본적으로 null이 있으면 연산이 되지 않는다. 
+	- 그룹함수는 null이 있어도, 해당 null 값을 제외하고 계산한다.
+---	
+-SUM
+select sum(sal)||'원' 총급여 from emp;
+	- 사원의 총 급여를 구하는 쿼리문
+select sum(comm)||'원' 총보너스 from emp;
+	- comm : null값이 있는 컬럼
+	- comm 총액을 구하는 쿼리문
+
+- AVG
+select round(avg(sal))||'원' 평균급여 from emp;
+	- 사원의 급여 평균을 구하는 쿼리문
+
+- MAX, MIN
+select max(sal)||'원' 총보너스 from emp;
+select min(sal)||'원' 총보너스 from emp;
+	- 가장 높은 급여와 가장 낮은 급여를 구하는 쿼리문
+	
+- COUNT : 개수를 구하는 함수
+- COUNT함수에 특정 컬럼을 기술하면, 컬럼 내 값을 가지고 있는 데이터의 개수를 구한다.
+- COUNT 함수는 null 값에 대한 개수를 세지 않는다.
+- 그러나 중복 제거의 기능을 담고 있지는 않다.
+
+select count(*) 사원수 from emp;
+	- 사원 수를 구하는 쿼리문	
+---
+sql에서 가장 중요한 건, join, sub query, group by 이다.
+---
+GROUP BY 절
+---
+- group by 절은 결과만 보면 distinct 기능과 비슷해보인다.
+- group by = 군집 = java의 set
+	- distinct은 중복된 행 제거, group by는 주로 각 그룹에 대한 집계값 계산 시 사용.
+- group by 시킨 컬럼명, 집합 함수 빼고는 출력이 불가능하다.
+
+select distinct deptno from emp;
+select deptno from emp GROUP by deptno;
+	- emp 내 부서를 중복없이 출력하기.
+
+select avg(sal) from emp group by deptno;
+	- emp 내 부서별로 평균급여 출력하기.
+---
