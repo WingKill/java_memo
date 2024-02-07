@@ -1,0 +1,152 @@
+20240207 데이터베이스 join
+
+---
+Oracle SQL Developer
+
+- 관계도 보기
+-> 파일 -> Data Modeler -> 임포트 -> 데이터 딕셔너리
+를 선택 후 
+1. 데이터베이스 접속
+2. 스키마/데이터베이스 선택
+3. 임포트할 객체 선택
+4. 디자인 생성
+단계를 밟으면, 데이터베이스 설계도를 볼 수 있음.
+---
+데이터베이스 설계를 전담으로 하는 사람이 맡고,
+해당 설계를 구현하는 과정을 분담.
+---
+데이터 설계 전담하는 사람을 컨설팅/ 아키텍쳐라 일컫는다고.
+---
+관계도에서,
+A -> B 로 비춰지는 경우 관계를 맺고 있다고 표현한다.
+sql에서의 관계는, 자바에서의 상속을 생각하면 이해가 쉽다고 한다.
+A가 자식 역할, B가 부모 역할이다. 
+---
+테이블 생성 시, 특정 컬럼에 key를 두고 생성한다.
+자식 역할을 하는 A는 B의 key를 가져오는 테이블이다.
+그 가져온 key를 foreign key라고 한다.
+---
+관계는 3가지가 있다.
+- 1:1 관계 
+- 1:n 관계
+- m:n 관계(현업에서는 아예 쓰지 않는다고 함. 비권장)
+---
+join : from 키워드 뒤에 오는 테이블 명이 2개 이상 되는 경우
+---
+조인의 기본 : 
+- 카테이션 곱(CARTESIAN PRODUCT) : 모든 경우의 수를 따지는 것.
+	- 해당 상황은, 조인인 상태에서 조건을 정하지 않은 상태일 때 출력된다.
+- 카테이션 곱 상태에서, 조건을 줘서 원하는 데이터들을 출력한다.
+---
+개발자들은 조인의 종류를 굳이 외우진 않는다고 한다.
+그러나, 면접에서는 나올 가능성이 높다고.
+---
+조인의 종류
+---
+EQUI JOIN 
+- 조인 대상이 되는 두 테이블이 존재.
+- 두 테이블에서, 공통적으로 존재하는 컬럼의 값이 일치되는 행을 연결하여 결과를 생성하는 조인 기법.
+select ename, dname from emp, dept where emp.deptno = dept.deptno;
+---
+- NON-EQUI JOIN(비등가조인)
+- 동일 컬럼이 없이 다른 조건을 사용하여 조인할 때 쓰이는 조인 기법
+- 각 사원의 급여가 몇 등급인지 살펴보기.
+select 
+ename 사원명, 
+sal 급여, 
+grade 등급 
+from emp , salgrade where sal between losal and hisal;
+---
+- SELF JOIN
+- 자기 자신과 조인을 하는 기법
+- 해당 사원의 매니저 이름이 나오게 하시오.
+select e.ename 사원, m.ename 매니저 from emp e, emp m where e.mgr = m.empno;
+select e.ename || '의 매니저는 '|| m.ename "사원 간 관계" from emp e, emp m where e.mgr = m.empno;
+---
+- OUTER JOIN 
+- 조인 조건에 만족하지 않는 행도 나타내는 조인 기법
+- 한 테이블 내 데이터가 없는 경우에도 출력시키기 위해 도입하는 조인 기법
+select nvl(e.ename,'해당직군 없음') "사원-직군", d.dname from emp e, dept d where e.deptno(+) = d.deptno;
+---
+- 서브쿼리
+- 하나의 SELECT 문장 내에 포함된 또 하나의 SELECT 문장이 있는 쿼리문
+- 1) 단일형 서브 쿼리
+select * from dept
+where deptno = (select deptno from emp where ename = 'SMITH');
+- 2) 다중행 서브 쿼리
+- 서브 쿼리에서의 결과가 두 건 이상 출력되는 것
+- 다중행 연산자
+- in : 메인 쿼리의 비교 조건이 서브 쿼리의 결과 중에서 하나라도 일치하면 참인 연산자
+- 연봉을 3000 이상 받는 사원이 소속된 부서와 동일한 부서에서 근무하는 사원들의 정보를 출력하는 쿼리문
+select emp.deptno, ename from emp, dept 
+where emp.deptno in (select dept.deptno from emp, dept where sal > 3000);
+any, some : 개발자들은 잘 안씀. 다른 용어로 대체가능.
+- 메인 쿼리의 비교 조건이 서브 쿼리의 검색 결과와 하나 이상이 일치하면 참인 연산자
+- any : 어떤. 조건 중 하나라도(하나 이상) 만족하면 참이다.
+- 부서 번호가 30번인 사원들의 급여 중 가장 낮은 값(950)보다 높은 급여를 받는 사원의 이름, 급여를 출력하는 쿼리문
+select ename, sal from emp where sal > (select min(sal) from emp where deptno = 30);
+select ename, sal from emp where sal > any (select sal from emp where deptno = 30);
+- 부서 번호가 30번인 사원들의 급여 중 가장 높은 값(2850)보다 낮은 급여를 받는 사원의 이름, 급여를 출력하는 쿼리문
+select ename, sal from emp where sal < (select max(sal) from emp where deptno = 30);
+select ename, sal from emp where sal < any (select sal from emp where deptno = 30);
+- all : 여러 비교 조건을 다 만족시키면 참이다. 
+select ename, sal from emp where sal > all (select sal from emp where deptno = 30);
+---
+선생님이 학생들의 선배들에게 react를 하라고 추천받았다고...
+---
+DDL : Data Definition Language 
+- 테이블 구조 자체를 생성, 변경, 삭제하는 언어
+---
+사실 실무에선 DDL을 직접 작성하는 경우는 없다.
+설계 툴을 활용해서 DDL을 작성하여 테이블 관리를 하는 경우가 많다.
+---
+국산 툴 exerd 도 괜찮다고 한다.
+-> 학원에서 하도 많이 쓰다보니, 무료로 쓸 수 있는 기간을 3개월에서 1개월로 줄여서 안쓰게 됐다고.
+물론, 회사에서는 해당 툴을 쓸 수 있다.
+last project하기 전에 툴 사용법을 다 알려준다.
+---
+create table
+- 문법적으로 외울 필요는 없다고 함. 현업에서 쓰는게 정해져 있기 때문.
+- 문자는 2가지 : 고정형, 가변형. 
+	- CHAR(size) : size만큼 고정길이.
+	- VARCHAR2(size) : variable char의 줄임말
+	  oracle로 넘어오면서 다 해당방식을 쓰라고 하게 됨. 기존에는 VARCHAR(size)방식을 썼었던 모양이다.
+- NUMBER 관련 컬럼
+DATE 
+이 정도만 쓴다고.
+- 현업에서는 실수하진 않지만, 프로젝트 만들 떄 LOB 컬럼에 이미지나 파일 저장을 하게 되는 경우가 있다고.
+	- 해당 부분은 잘 안쓴다고. 차라리 링크를 받고 연결시키는 게 낫다고.
+---
+ALTER MODIFY
+- 테이블에 이미 존재하는 컬럼을 변경하는 명령어
+- 자료가 없을땐 다 바꿀 수 있음.
+- 자료가 있으면 데이터 타입은 못바꾸고, 크기는 데이터 크기보다 작게 바꿀순 없음. 늘리기는 가능.
+---
+DROP COLUMN
+- 테이블에 이미 존재하는 컬럼을 삭제하는 명령어
+- 데이터가 있을 땐 컬럼이 삭제되지 않는다.
+- 현업에서는 삭제를 아예 안한다고 한다.
+---
+회원탈퇴를 하면 데이터를 바로 지우지 않는다.
+- disable 처리를 해버린다. 법에 따라 달라지는 것이라, 최근은 어떤지 모름.
+---
+- 그래서, 해당 과정을 해야 한다면 다른 테이블을 만들어 데이터를 옮기는 백업 과정을 거친다.
+---
+DROP TABLE
+- 테이블 구조 제거.
+---
+TRUNCATE TABLE
+- 테이블 내 모든 데이터 제거
+---
+커뮤니케이션 에러가 나오지 않도록 조심해야 한다.
+실수는 잘 안하지만, 커뮤니케이션 에러 때문에 사건이 발생하는 경우는 종종 있다고.
+이건 옛날이든, 최근이든 염두해둬야 하는 사항이다.
+---
+RENAME
+- 기존에 사용하던 테이블의 이름을 변경하기 위한 명령어
+---
+table에서 delete, truncate, drop 의 차이 
+- delete : 지워지지만 테이블 용량은 줄어들지 않는다. -> 롤백이 가능.
+- truncate : 데이터만 삭제된다. 삭제 후 되돌릴 수 없다.
+- drop : 컬럼 등 테이블 형태를 포함한 모든 것이 삭제된다. 삭제 후 되돌릴 수 없다.
+
