@@ -1,0 +1,135 @@
+20240208 데이터베이스 DML
+
+DML(Data Manipulation Language)
+- 데이터 조작어
+- 테이블의 내용을 추가, 수정, 삭제하기
+
+---
+CREATE TABLE DEPT02 AS SELECT * FROM DEPT WHERE 1=0;
+	- 데이터는 복사하지 않고, 구조만 복사하기 위한 구문.
+	- 1 = 0 자체가 무조건 false이기 때문에, 해당 조건을 통해 데이터 복사를 막는 것이다.
+---
+INSERT
+- 테이블에 새로운 로우 추가 시 사용.
+- insert into 컬럼명집합 value 데이터집합 
+
+insert into dept02 (deptno, dname, loc) values (10,'ACCOUNTING', 'NEW YORK');
+insert into dept02  values (20,'ACCOUNTING', 'NEW YORK');
+	- INSERT문 기본 구조. 컬럼에 들어갈 내용을 차례대로 입력하면 된다.
+	- 컬럼명 생략 가능. 해당 상황 시, 순서를 바꿔서 입력하면 에러가 날 수 있다. 
+
+---
+commit;
+- 내부 동작은 다르지만, 일단 해당 서술 방식으로 이해하자.
+- 메모리에 dept02를 올리게 된다. 
+- commit을 하면 dept02에 보내게 된다.
+- 영구 저장이라 생각하면 된다.
+-> insert 문을 쓰고 나면 commit을 무조건 하게 된다.
+---
+insert into dept03 select * from dept; 
+	- value를 생략하고, 기존 테이블의 데이터를 통째로 삽입할 수 있다.
+---
+UPDATE
+- 테이블에 저장된 데이터를 수정하기 위해서 사용
+- update 테이블명 set 수정사항 where 조건
+UPDATE emp01 set deptno = 30;
+	- 모든 사원의 부서 번호를 30번으로 수정 후 확인
+update emp01 set deptno = 40 where deptno = 10;
+	- 부서 번호 10번인 사람들을 40번으로 수정
+- 2개 이상의 컬럼을 변경하려면, 수정사항 부분에 ,를 이용하여 나열하면 된다.
+update emp01 set deptno = 20, job = 'MANAGER' where ename = 'SMITH';
+	- SMITH 사원의 부서번호는 20번으로, JOB 컬럼값은 MANAGER로 수정하는 쿼리문
+---
+commit 하기 전에 롤백은 가능하지만, commit이후에는 이전 사항으로 되돌아갈 수 없다.
+---
+DELETE
+- 테이블에 저장되어 있는 데이터를 삭제하는 명령문
+delete from dept01
+	- 테이블 내 모든 행을 삭제한다.
+delete from emp01 where deptno = (select deptno from dept01 where dname = 'SALES');
+	- 서브 쿼리문으로, 부서명이 SALES인 부서번호부터 알아낸뒤, SALES 부서 소속의 사원을 삭제하는 쿼리문
+	- emp01에서 삭제하는 것.
+---
+은행권 서버 관리 방식
+- 서버를 해외에 둔다.? -> 법적으로 불가
+- 백업 서버를 둔다. -> 전쟁나게 되면 매한가지다
+- 이걸 왜 적어.. 흠;
+---
+트랜잭션
+- 데이터베이스 내에서 하나의 그룹으로 처리되어야 하는 명령문들을 모아 놓은 작업 단위
+- 데이터베이스에서는 데이터의 일관성과 무결성을 보장하기 위해서는 반드시 트랜잭션 관리가 필요
+- 현업에서도 중요
+- 소프트웨어에서도 해당 부분을 구현한다고.
+---
+COMMIT
+- 모든 작업을 정상적으로 처리하겠다고 확정하는 명령어
+- COMMIT을 수행하면, 하나의 트랜젝션 과정을 종료하게 된다.
+- 자동 COMMIT되는 경우
+	- SQL*PLUS가 정상 종료된 경우
+	- DDL과 DCL 명령문이 수행된 경우
+---
+ROLLBACK
+- 작업 중 문제가 발생했을 때, 트랜젝션의 처리 과정에서 발생한 변경 사항을 취소하고, 트랜젝션 과정을 종료
+- 자동 ROLLBACK되는 경우
+	- SQL*PLUS가 비정상 종료된 경우
+	- 정전이 발생했거나 컴퓨터 DOWN된 경우
+---
+무결성 제약 조건
+- 데이터 무결성 제약 조건(Data integrity Constraint Rule)
+- 테이블에 부적절한 자료가 입력되는 것을 방지하기 위함.
+- 테이블을 생성할 때, 각 컬럼에 대해서 정의하는 여러 가지 규칙이다.
+- 무결성 : 데이터베이스 내에 있는 데이터의 정확성 유지
+- 제약 조건 : 바람직하지 않은 데이터가 저장되는 것을 방지하는 것
+---
+무결성 제약 조건에 대해서, 간단하게 생각하기.
+일반적으로 테이블의 제약 조건은
+- primary key
+- foreign key
+- check
+이 세가지 중 하나가 걸려있다.
+---
+제약 조건은 총 5가지를 지원함
+- not null : null 지원하지 않음
+CREATE TABLE EMP02(EMPNO NUMBER(4) NOT NULL, ENAME VARCHAR2(10) NOT NULL, JOB VARCHAR2(9), DEPTNO NUMBER(2));
+- unique : 중복값 비허용, 항상 유일값을 가짐
+CREATE TABLE EMP03(EMPNO NUMBER(4) UNIQUE, ENAME VARCHAR2(10) NOT NULL, JOB VARCHAR2(9), DEPTNO NUMBER(2));
+- primary key : null 비허용, 중복값 비허용. not null + unique
+CREATE TABLE EMP04(EMPNO NUMBER(4) PRIMARY key, ENAME VARCHAR2(10) NOT NULL, JOB VARCHAR2(9), DEPTNO NUMBER(2));
+- foreign key : 참조 테이블에 값이 존재하면 허용
+- check : 지정 데이터값의 범위나 조건 지정 후, 설정값 허용. 
+ 	    현업에서는 개발자들이 check를 잘 걸지 않는다고 한다. 걸어야 하지만...
+	- 툴마다 테이블 생성 시 check가 자동으로 구현되기도 하고, 직접 개발자가 구현해야 할 수도 있다.
+CREATE TABLE EMP05(
+EMPNO NUMBER(4) PRIMARY key, 
+ENAME VARCHAR2(10) NOT NULL, 
+JOB VARCHAR2(9),
+DEPTNO NUMBER(2),
+CONSTRAINT EMPNO_CK check(empno >= 50)
+);
+---
+제약 조건을 걸지 않으면, sts로 쳤을 때 컴파일 에러보다 실시간 에러를 발생시킬 확률이 늘어난다.
+결국, 컴파일 에러가 차라리 낫다. 실시간 에러로 이어지기 전에 수정을 진행할 수 있으니...
+즉, 안정성이 늘어나는 것이다.
+---
+check의 경우에는 db 담당자에게 허락을 맡아서 설정해야 한다.
+-> 담당자가 해야 하는 일이 많아지니 안넣어준다고.
+---
+constraint 
+- 제약 조건에 이름을 붙여주는 것.
+---
+참조 무결성
+- 테이블 사이의 관계에서 발생하는 개념
+- 두 테이블 사이의 주종 관계(주체가 되는 테이블(부모 테이블)과 종속이 되는 테이블(자식 테이블))
+- 먼저 정의되어야 하는 테이블이 부모 테이블, 나중에 정의되어야 하는 테이블이 자식 테이블
+---
+FOREIGN KEY
+- REFERENCES 키워드를 통해 생성한다.
+- 개발자들은 보통 부모에 있는 key와 자식에 있는 컬럼을 동일하게 만든다.
+
+CREATE TABLE EMP06(
+    EMPNO NUMBER(4) PRIMARY key, 
+    ENAME VARCHAR2(10) NOT NULL, 
+    JOB VARCHAR2(9),
+    DEPTNO NUMBER(2) CONSTRAINT EMP06_DEPTNO_FK REFERENCES dept(DEPTNO)
+);
+
