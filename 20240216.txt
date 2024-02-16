@@ -1,0 +1,116 @@
+20240216 웹 프로그래밍
+
+- form 태그에서 중요한 부분 중 하나 : method 정하기
+-> 전달 방식을 정하는 것
+-> default 값은 get
+-> 보안을 위해서라면 post 방식이 좋다.
+---
+면접 때 물어보는 요소 중 하나.
+response.sendRedirect("pass.jsp?age=" + age);
+---
+Redirect vs forward
+redirect : 유저로 하여금, 지정된 url로 다시 치고 들어와라.
+forward : 서버 내부에서 url을 던져주는 것. 
+
+redirect - url 변화함, 객체 재사용하지 않고 재생성함. 
+-> 객체를 전달할 필요가 없을 때
+-> 시스템에 변화가 생기는 경우 사용하는 것이 적합함.
+forward - url 변화하지 않음, 객체 재사용함. 
+-> 객체를 계속 전달할 필요가 있을 때.
+-> 시스템에 변화가 생기지 않는 경우 사용하는 것이 적합함.
+---
+액션 태그 : <jsp: 방식으로 시작하는 태그이다. > 
+예시 - <jsp:forward page=""></jsp:forward>
+해당 태그에서, forward 부분은 action이라고 표현한다.
+action은 이미 기존에 프로그래밍되어 내장된 것이며, 어떤 실행과정이 진행된다.
+이는 scriptlet으로 표현 시 길어지는 부분을, 액션 태그로 구현해놓은 것이라 이해하면 된다고 한다.
+---
+<jsp:forward page="sub.jsp"></jsp:forward>
+<jsp:forward page="sub.jsp"/>
+위 두 태그는 동일한 표현이다. 보통 아래 표현을 자주 쓴다. 코드가 상대적으로 짧으니까.
+---
+<jsp:include page="" />  
+include 태그는 파일 자체를 포함시키는 태그.
+---
+AI의 등장으로 사그라드는 직업도 있고, 살아나는 직업도 있고...
+이를 개발하는 직업군으로 들어갈 수 있는 교육이라 다행이라는데
+그냥 그렇다. 적응해야지 뭐.
+---
+<jsp:param />
+parameter 태그 : forward 태그에서 parameter를 전달하고자 할 때 사용할 수 있는 태그
+---
+forward 태그를 통해 전달하는 데이터 전달 방식 : 기본적으로 get 방식
+-> forward 태그는 실제로 form 태그 내 input 요소 속성들을 hidden으로 지정(데이터를 전달하기 위함)
+-> 해당 부분만 만들어 forward 태그로 구현해놓은 것. 전달 방식을 고치지 않은 것.
+-> 데이터 전달 방식을 고치지 않는다면 기본 세팅으로 되어 있는 것이다.
+-> parameter 태그는 기본적으로 input type = hidden이 탑재되어 있는 태그로 생각해도 되겠다.
+---
+빈 - java의 클래스를 만드는 것
+---
+Bean이 나오게 된 이유
+-> html 이용자의 java에 대한 접근성을 높이기 위한 선택
+---
+<jsp:useBean id="student" class="edu.sejong.ex.Student"/>
+위 태그는 <% Student student = new Student(); %>와 동일하다.
+default 생성자(매개변수가 없는 생성자)를 이용해서 만들어주는 태그이다.
+그러므로, 클래스를 만들 때 매개변수를 받는 생성자를 따로 선언하고 default 생성자를 만들어주지 않으면 오류가 발생한다.
+---
+<jsp:setProperty name="student" property="name" value="홍길동"/>
+위 태그는 <% student.setName(value); %>와 동일하다.
+---
+<jsp:getProperty name="student" property="name" />
+위 태그는 <% student.getName(); %>와 동일하다.
+---
+org.apache.jasper.JasperException: File [/bean.jsp(16,6)] uses name [name] in jsp:getProperty for a bean that was not previously introduced as per JSP.5.3
+
+와 같은 에러가 발생했었는데, 대입이 안됐다는 얘기다.
+태그 속성을 정할 때, 속성명을 바꿔서 적용했을 경우에 발생했었다. 
+꼭 이런 경우가 아니더라도 useBean 태그를 사용하지 않는 경우일 때 발생할 수도 있겠다.
+물론, 보통은 태그 내 속성에 값을 제대로 전달하는 게 제일 좋겠다.
+---
+Bean 태그 사용 시, java 내 변수명은 Camel case를 따라야 한다.
+- 이름의 첫 문자는 무조건 소문자, 각 단어의 첫 문자는 대문자.
+---
+setter and getter 명명식에 따라 메서드 이름을 짜면, 태그에서 활용이 가능하다.
+---
+<jsp:setProperty name="circle" property="radius" value="<%=radius%>"/>
+해당 방식처럼 scriptlet을 직접 사용하여 value에 대입할 때 request.getParameter()를 직접 넣으면 오류가 발생한다.
+```
+org.apache.jasper.JasperException: /circle.jsp (행: [11], 열: [59]) 속성 값 [ request.getParameter("radius") ]이(가) ["]을(를) 사용하여 인용부 처리되어 있는데, 이는 값 내에서 사용될 때에는 반드시 escape되어야 하는 것입니다.
+```
+아무래도 String으로 리턴되는데, 그 값에 ""을 넣는 상태라 그런 걸까 싶지만...
+그래서 ""을 없애면 인용부호를 사용하라는 에러메세지가 뜬다. 
+```
+org.apache.jasper.JasperException: /circle.jsp (행: [11], 열: [56]) 인용부호가 요구됩니다.
+```
+결국은 위에서 scriptlet 처리하여 변수에 대입해서 처리하는게 가장 깔끔하게 처리된다.
+---
+프로젝트 ppt 파일은 제공 파일을 보고 참조하면 된다.
+---
+면접 때 자주 질문하는 것들.
+
+1. get 방식과 post 방식의 차이
+- get : url에 정보가 노출
+- post : url에 정보가 노출되지 않음
+2. redirect와 forward의 차이
+- redirect : 사용자에게 화면을 새로 보여줌. 객체 새로 생성. 
+- forward : 사용자의 화면에 바로 보여줌. 객체 계속 사용.
+3. 쿠키와 세션의 차이
+
+4. scope 영역의 차이 
+---
+웹 서버는 다수를 기다린다.
+---
+서버가 연결을 바로 끊는다.
+-> 몇 명이 올 지 모르기 때문에, 채팅처럼 계속 동시 접속 상태를 유지할 수 없다.
+-> 구간을 두고 연결을 끊는다고 한다.
+---
+쿠키는 서버에서 생성하여, 서버가 아닌 클라이언트측에 특정 정보를 저장하는 것.
+- 서버에 요청할 때마다 쿠키의 속성값을 참조 또는 변경 할 수 있습니다.
+- 4kb로 용량이 제한적이며, 300개까지 데이터 정보를 가질 수 있다.
+---
+웹브라우저마다 쿠키를 보관하는 공간이 존재한다.
+---
+쿠키를 심은 상태라면, 서버에 접속하는 순간마다 해당 쿠키가 계속 끌려온다. 
+같이 보낸다는 게 핵심.
+---
