@@ -1,0 +1,122 @@
+20240219 웹 프로그래밍_쿠키_세션_등
+
+<jsp: usebean > : 객체 생성 및 setter and getter를 호출할 수 있는 액션 태그
+
+---
+
+쿠키, 세션
+-> 연결이 끊겼을 때 데이터를 유지하기 위한 수단.
+: 연결성 유지를 위한 수단. 
+- 어찌 보면 꼼수로 볼 수도 있다.
+
+---
+
+http 프로토콜 : html을 주고 받기 위한 프로토콜이라고 이해해도 좋음.
+
+---
+쿠키 문법
+
+setMaxAge() : 쿠키 유효기간을 설정.
+setpath() : 쿠키사용의 유효 디렉토리를 설정.
+setValue() : 쿠키의 값을 설정.
+setVersion() : 쿠키 버전을 설정.
+getMaxAge() : 쿠키 유효기간 정보를 얻는다.
+getName() : 쿠키 이름을 얻는다.
+getPath() : 쿠키사용의 유효 디렉토리 정보를 얻는다.
+getValue() : 쿠키의 값을 얻는다.
+getVersion() : 쿠키 버전을 얻는다.
+
+---
+쿠키 초기화 : setMaxAge(0); 
+-> 유효 기간을 0으로 설정하여 쿠키가 만료되는 것.
+---
+
+쿠키와 세션의 차이
+- 쿠키 : 클라이언트에 다시 접근하여 텍스트 형태로 남기는 데이터 집합.
+-> 서버에 접근할 때마다 쿠키를 가지고 감.
+-> 4kb, 300개의 데이터 정보 등 제한적인 용량과 데이터 보유량. 
+
+- 세션 : 서버 상에 객체로 저장됨. 
+-> 서버에서만 접근 가능. 보안 up. 저장 데이터 한계치가 없음.
+-> 서버에 부담을 줄 수 있음.
+
+---
+
+jsp에서는 세션과 관련된 내장 객체를 지원한다.
+
+---
+세션 문법
+
+setAttribute() : 세션에 데이터를 저장.
+getAttribute() : 세션에서 데이터를 얻는다.
+getAttributeNames() : 세션에 저장되어 있는 모든 데이터의 이름(유니크한 키값)을 얻는다.
+getId() : 자동 생성된 세션의 유니크한 아이디를 얻는다.
+isNew() : 세션이 최초 생성되었는지, 이전에 생성된 세션인지를 구분.
+getMaxInactiveInterval() : 세션의 유효시간을 얻는다. 가장 최근 요청시점을 기준으로 카운트 된다.
+(C:\javalec\apache-tomcat-7.0.57\apache-tomcat-7.0.57\conf\web.xml 참조)
+removeAttribute() : 세션에서 특정 데이터를 제거한다.
+Invalidate() : 세션의 모든 데이터를 삭제한다.
+
+---
+
+세션 객체에 있는 모든 객체를 확인하기
+	Enumeration enumeration = session.getAttributeNames();
+	int i = 0;
+	while(enumeration.hasMoreElements()){
+		i++;
+		
+		String name = enumeration.nextElement().toString();
+		String value = (String)session.getAttribute(name).toString();
+		out.println("==========================<br>");
+		out.println("<h1>키 : " + name + "</h1>" );
+		out.println("<h1>Value : " + value + "</h1>");
+		out.println("==========================<br>");
+	}
+
+---
+
+1. get, post
+2. redirect, forward
+3. 쿠키와 세션
+4. scope
+
+---
+
+Scope : 메모리 영역
+- pageContext : 자기 자신만 가져올 수 있는 것. 현재 페이지에서만 가능.
+- request : forward까지. 한 HTTP 요청에 대해 유효하다고 한다.
+- session : 전역 객체. 세션이 유지되는 시간동안만. 웹 서버에서는 기본적으로 30분만 돌린다.
+- application : 웹 서버가 유지되는 동안 사용 가능. 웹 서버 시작 시 생성되고, 서버 종료나 재시작될때까지 유지됨.
+
+---
+
+JVM의 메모리 영역 : Method Area : static / Call Stack : 지역변수, 지역함수 / Heap : 객체
+
+---
+
+현재 Tomcat 에 맞춰서 코딩 중. Tomcat이 기능을 제공해주고 있음.
+
+Tomcat의 메모리 영역을 배운다고 보면 됨.
+
+---
+
+jsp는 무조건 servlet 파일이다.
+jsp에는 static과 같이, 먼저 올려서 공유하는 메모리 영역이 없다.
+ 
+---
+
+scope 중 session을 주로 많이 사용.
+요청 시 request 사용.
+나머지는 잘 사용하지 않음.
+
+---
+
+session ID 
+- 세션이 구동되는 핵심 원리
+- 웹 프로그로밍에서 가장 중요한 부분 중 하나 : 로그인과 관련되어 있기 때문.
+- 해당 부분을 이해한 상태에서 코딩해야 감을 잡는 것. 
+-> 소셜 로그인에도 적용되는 것
+
+- 각각의 웹 서버마다 이름은 다를 수 있다.
+- 세션 id는 웹 브라우저마다 1개씩 던져준다.
+- 
