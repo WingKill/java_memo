@@ -1,0 +1,159 @@
+20240220 웹 프로그래밍_예외처리
+
+세션ID : 해당 쿠키로 싹 전달한다.
+
+---
+
+예외 처리
+- 톰캣이 제공하는 예외 페이지가 아닌, 다른 페이지로 유도하는 것.
+
+---
+
+JSP,servlet에서는 
+- page 지시자
+- web.xml파일
+을 통한 예외 처리 방식이 사용된다.
+
+---
+
+톰캣이 에러 메세지를 뿌리는 페이지를 보여주는 경우는 
+엄연히, 에러를 접할 경우 만들어서 보여주는 것이다.
+
+---
+
+response.setStatus(200);
+
+200의 의미 : 에러 발생 시 처리를 제대로 했다는 표시. 
+
+---
+
+exception : page isErrorPage="true" 일 때 사용가능한 객체
+
+---
+
+pageContext
+request
+response 
+session
+application
+exception
+
+등등... 여러가지의 내장객체가 있다.
+
+---
+
+web.xml은 /WebContent/WEB-INF 안에 넣어 실행해준다.
+web.xml을 수정한 경우에는 서버를 다시 실행해야 적용된다.
+
+---
+
+page 지시자의 경우에는 errorPage를 직접 지정했어야 했다.
+web.xml 파일과 errorPage mapping 방식은, 실행 페이지에서 직접 errorPage를 지정할 필요가 없다.
+
+---
+
+xml에서, 
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+는 프로젝트 실행 시, welcome-file-list 내에 있는 파일 중 처음 만나는 파일을 실행시킨다는 의미.
+- 해당 파일들의 위치에 신경써야 한다.
+
+---
+
+tomcat이 해당 프로젝트를 메모리로 올리기 전,
+/WebContent/WEB-INF 내에 있는 web.xml 파일을 먼저 읽어들인다.
+web.xml은 환경설정 파일이다.
+즉, 해당 프로젝트의 설정을 기본적으로 할 수 있도록 만든 파일이다.
+
+---
+
+java 기본적인 문법 에러는 500에러를 띄운다고 보면 된다. 
+
+---
+
+프로젝트에서는 404, 500번 에러가 자주 뜨기 때문에 해당 부분을 먼저 처리해보았다.
+에러 코드 종류 관련 링크 : https://hongong.hanbit.co.kr/http-%EC%83%81%ED%83%9C-%EC%BD%94%EB%93%9C-%ED%91%9C-1xx-5xx-%EC%A0%84%EC%B2%B4-%EC%9A%94%EC%95%BD-%EC%A0%95%EB%A6%AC/
+
+---
+
+sql을 꾸준히 해놓길 바란다. sql 처리에 대해서는 알아야 한다.
+코딩보다 db table에 적응하는데 시간이 더 걸릴 것.
+
+---
+
+JDBC : Java DataBase Connection
+
+---
+
+순서 : JDBC 드라이버 로드 -> 데이터베이스 연결 -> sql문 실행 -> 데이터베이스 연결 해제
+
+DriverManager -> Connection -> Statement -> ResultSet
+
+---
+
+Oracle driver 사용하기. : ojdbc.jar 
+- class.path에 넣거나, tomcat에 넣거나, 라이브러리 파일로 넣거나..
+- 보통 개발자들은 라이브러리에 드라이버를 넣어준다.
+- /WebContent/WEB-INF/lib 폴더 내에 해당 파일을 넣어주면 된다.
+수업용 프로젝트에는 ojdbc6_g.jar 파일을 넣어 진행했다.
+
+---
+
+데이터베이스는 항상 켜놓는다고 보면 된다.
+관련 작업을 할때 항상 데이터베이스와 연결이 되는지 안되는지를 체크해야 하므로..
+
+---
+
+sql 테이블의 변수명을 한글로 해도 되지만, 현업에서는 그래선 안된다.
+
+---
+
+sql column 이름은 대문자든, 소문자든 상관이 없다.
+
+---
+
+DBMS는 Oracle, MySql, MariaDB, MSSQL, NoSql, HaDoop 등이 있다.
+
+---
+
+oracle sql의 어떤 데이터든, 모두 getString으로 가져올 수 있었다. 
+물론 Date는 Date나 Timestamp, String 다 형식이 다양했다. 
+sql에서는 number에서도 null이 있기 때문에, 해당 부분을 null로 받고 싶다면
+String으로 받으면 될 것이다.
+
+---
+
+/*value Object = bean*/
+/*Data Access Object* = DAO*/
+현업에서는 클래스명으로 어느 정도 용도를 표출.
+
+---
+
+sql 설정에 대해서는 기본적으로 직접 치기보다는 복사 붙여넣기를 해주는 게 좋다.
+
+---
+
+프로그램 application
+
+---
+
+Oracle에서 어떻게 접속하고 활용하는지는 제조사에서 제공해줘야 한다.
+
+---
+
+resultset의 함수들은, getInt()의 경우 자바의 int로 넘겨주는 것
+
+---
+
+connection 객체는 close()를 해줘야 한다.
+
+---
+
+
+https://float.tistory.com/189
