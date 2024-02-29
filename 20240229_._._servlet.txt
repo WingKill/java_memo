@@ -1,0 +1,249 @@
+20240229_웹프로그래밍_구현중
+
+---
+
+비즈니스 로직
+
+- 한 메서드(함수)에서는 최대한 하나의 기능만 가지고 있는게 좋다.
+
+- 조회수는 Dao의 메서드 하나에 메서드를 또 호출하는 방식보다는, 
+command에서 조회수 증가 메서드와 처리 메서드를 차례대로 호출하는 게 좋다.
+
+---
+
+SB admin 2 를 검색하면, Start Bootstrap의 무료 템플릿으로 이동됨. 이를 활용해서 넣는 연습을 해봄.
+
+- WebContent 내에, 다운로드하여 압축을 해제한 파일을 다 복사 붙여넣기를 하여 집어넣는 방식이라고.
+
+---
+
+Servers의 Tomcat server 내 context.xml에서, 
+<Context> 태그 안에 
+	<Resource 
+		auth="Container" 	
+		driverClassName="oracle.jdbc.OracleDriver"	
+		maxIdle="10" 	
+		maxTotal="20"	
+		maxWaitMillis="-1"	
+		name="jdbc/oracle"	
+		password="tiger" 	
+		type="javax.sql.DataSource"	
+		url="jdbc:oracle:thin:@127.0.0.1:1521:xe"	
+		username="scott"
+	/>
+
+아래 내용이 붙여져 있는 경우, Bdao()에서는 해당 방식을 통해 Connection pool을 가져올 수 있다.
+
+	private DataSource dataSource = null;
+	private Context context = null;
+	
+	public BDao() {
+		try {
+			context = new InitialContext();
+			dataSource = (DataSource)context.lookup("java:/comp/env/jdbc/oracle");
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
+해당 부분이 외워지지 않는다.
+
+---
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
+HTML은 위 지시자가 없고, jsp는 위 지시자가 선언되어 있다.
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+jstl 표준 라이브러리 중 C는 해당 지시자 형태로 표현한다.
+
+---
+
+현재 프로젝트에는 database와 연결하는 걸 도와주는 library, jstl library가 필요하다.
+라이브러리 추가 방식으로 진행하는 중.
+
+---
+
+Servlet을 상속받는다 -> 상속받지 않으면, 웹 프로그래밍을 할 수가 없다.
+
+---
+
+WAS : Web Application Server
+
+---
+Web Server + WAS 로 구성된 서버 : tomcat
+---
+
+WAS와 Web Server 차이
+- 
+- 제일 처음 웹 서비스를 하는 건 HTML밖에 없었다.
+- 점차 HTML을 동적으로 만들기 시작함. 
+- 동적으로 만든다의 의미 : HTML에 language가 들어가는 것.
+- 현재 배우는 것 : HTML에 java를 넣어 소스코딩을 하는 것(jsp/servlet)
+
+- HTML만으로 게시판을 짜는 것? 할 수가 없다. 결국 다른 언어를 추가할 수밖에 없는 상황.
+
+- 웹 브라우저는 .jsp를 절대로 해석하지 못한다. 
+-> 웹 브라우저가 해석할 수 있도록, .jsp를 .html 파일로 변환해줘야 한다.
+-> WAS는 program language를 해석해주는 역할.  Web Server는 Html만 해석해주는 역할.
+
+---
+
+WAS -> Servlet
+- 
+
+---
+
+웹 서버의 동시접속이라는 표현 -> 쓰레드 처리
+- 내부적으로 웹 서버가 동시접속을 받아낼 수 있는 이유
+-> 클라이언트 요청 시, 각각에게 한 개의 쓰레드 배분.
+
+---
+
+OS가 프로그램을 여러개 실행시킨다.
+-> 겹치지 않도록 메모리 공간을 잡는다. 
+
+Tomcat이 각각의 프로젝트별로 돌아가는 메모리를 겹치지 않게 잡는다.
+-> OS에서의 메모리 분배 개념과 동일하다고.
+-> Tomcat 내, 프로젝트 단위로 저장되는 모음집들을 Servlet Container라고 표현 - Controller, Command, Dao, Dto 등
+-> Servlet 컨테이너는, 요청 시마다 쓰레드 생성.
+
+---
+
+Servlet의 사용도가 높은 이유 : 빠른 응답 속도
+
+Servlet Life Cycle 
+	- 1. Servlet 객체 생성 - 즉, 생성자 - 최초 한번 생성
+	- 2. init() 혹은 @PostConstruct 어노테이션이 달려있는 메서드 호출. - 최초 한번 호출. 
+	- 3. service(), doGet(), doPost() - 요청할 때마다 매번 호출 
+	- 4. destroy() 혹은 @PreDestroy 어노테이션이 달려있는 메서드 호출 - 마지막 한번 호출.
+
+- Servlet 생사권은 Framework(tomcat)가 가지게 됨. 
+	- Servlet 생성 시 HttpServlet을 상속받은 클래스 형태로 제공하고 있다는 점...
+	- 종속되는 대신, 기능을 제공받는 셈
+
+---
+
+Framework은 일반적으로 life cycle을 가지고 있다.
+
+---
+
+이전에 프로젝트 lib에 web.xml을 넣고, 해당 파일에서 페이지 설정을 진행했었다. 이를 활용하는 시간.
+
+---
+
+Dynamic Web Module version이 1.0이던 시절에는 어노테이션이 제공되지 않았다.
+- library에 web.xml을 넣고 web.xml을 편집하여 활용했었다고 한다.
+- 최근에는 다들 Dynamic Web Module version을 3.0 이상을 쓰고 있다고.
+
+---
+
+web.xml 파일
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" 
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+	<!-- ServletInitExample servletInitExample = new ServletInitExample(); -->
+	<servlet>
+		<servlet-name>servletInitExample</servlet-name>
+		<servlet-class>edu.sejong.ex.controller.ServletInitExample</servlet-class>
+		<init-param>
+			<param-name>id</param-name>
+			<param-value>abcdef</param-value>
+		</init-param>
+		<init-param>
+			<param-name>pw</param-name>
+			<param-value>1234</param-value>
+		</init-param>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>servletInitExample</servlet-name>
+		<url-pattern>/initServlet</url-pattern>
+	</servlet-mapping>
+</web-app>
+
+---
+
+어노테이션
+
+@WebServlet(urlPatterns = {"/test"},
+initParams = {@WebInitParam(name = "id", value="abcde"), @WebInitParam(name = "pw", value="12345")})
+
+---
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" 
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+
+	<context-param>
+		<param-name>kor</param-name>
+		<param-value>90</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>eng</param-name>
+		<param-value>80</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>math</param-name>
+		<param-value>70</param-value>
+	</context-param>
+</web-app>
+
+두 파일 내용을 비교하면,
+context-param : 모든 servlet에 공유되는 변수. servlet 안에 선언된 변수가 아니라, web-app 안에 선언된 변수
+init-param : servlet안에 선언된 변수는 해당 serlvet에서만 사용 가능하다.
+
+---
+
+항상, 현업에서는 선배나 후배에게 설명해야 할 기회가 반드시 생긴다고 한다.
+그럴 때 그림으로 설명하면 유용하다.
+
+---
+
+web.xml : 프로젝트 설정 파일
+
+chat gpt 발췌내용
+- Java EE 5 이전의 스펙에서 필수적으로 사용되었다고 한다.
+- Java EE 6 부터는 어노테이션이 주로 사용됨
+- Java EE 8부터는 web.xml이 선택 사항이 되었으며, 대부분의 설정은 애노테이션을 사용하여 구성된다고 함.
+
+---
+
+getServletContext.getInitParameter() : context-param 꺼내오는데 사용하는 메서드 형식
+getInitParameter() : init-param 꺼내오는데 사용하는 메서드 형식
+
+---
+
+ServletContextListener : 생명주기를 감시하는 Listener
+- callback 이라 표현
+- 프로젝트 진행 시 내가 안써도, 누군가가 쓰고 있다고...
+
+---
+
+ServletContextListener 를 구현하는 Listener는 @WebListener을 활용해야 한다.
+- 인터페이스를 상속받는 만큼, 구현해야 하는 메서드가 2개가 있다.
+- contextInitialized()와 contextDestroyed()이다.
+-> listener는 web.xml에 등록하는 과정을 밟는다.
+	<listener>
+		<listener-class>edu.sejong.ex.listener.ContextListenerExample</listener-class>
+	</listener>
+-> 해당 과정을 진행하면 listener가 등록된다.
+
+---
+
+web.xml을 수정하게 되면, 기존에 돌리면 프로젝트를 모두 종료하였다가 다시 실행하며 초기화를 진행해야 한다.
+- 종료 시 : contextDestroyed 메서드 호출
+	- 호출 후 종료
+- 종료 후 Context(프로젝트)를 메모리에 올릴 때 : 생성자와 contextInitialized 메서드 호출
+
+---
+
+각각의 모든 프레임워크는, 종료 시 저장하는 로직을 구현해놓는다. 
+
+---
+
+.xml에서 반드시 설정하게 되는 것들 : listener 등록, 에러 페이지 설정
