@@ -1,0 +1,126 @@
+20240306_CSS속성들
+
+---
+
+이미지 삽입 시 크기 조절이 제일 감이 안잡힌다....
+사실, 이미지 삽입 자체는 상관없는데 여백을 넣지 않아야 한다는 조건이 추가되면 ... 
+그 부분을 중점으로 배워야겠다.
+
+방법은 고정된 게 아니다.
+결과가 잘 나오면 된 것.
+
+---
+
+margin-top : -15px;
+- -값을 줄 수 있다.
+- ul의 기본 margin이 1em으로 처리되어 있어서, 부모 요소의 마진 값을 변동시킨 것.
+
+---
+
+.navi a:visited
+- .navi 클래스 내, 방문했던 a 링크
+
+---
+
+이미지 삽입은, 그냥 폴더 추가 후 이미지를 넣어두는 게 제일 편한 방법일 거 같다.
+github로 관리하는 건 좀 아닌 듯
+
+---
+
+font-family 속성
+- 여러 개의 값(글꼴 이름)을 가질 수 있음
+- 여러 개의 값을 가진 경우, 브라우저는 첫 번째로 찾은 글꼴을 사용
+- 아래와 같이 속성값을 부여하면, 우선 순위가 왼쪽 첫번째부터 1순위이다.
+```
+	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+```
+
+---
+
+font-size 
+- 고정 단위보다는 가변 단위를 사용하는 게 유용하다.
+
+---
+
+line-height
+- 기본적으로 줄 간격을 뜻함
+- line-height와 height의 값을 동일하게 맞추면, 해당 글씨가 수직으로 중앙정렬된다.
+-> 글짜 생성 시, 기본적으로 left top 위치에 생성된다.
+
+---
+
+<a href="http://sba.seoul.kr" target="_blank">서울산업진흥원</a>
+- href : 연결된 주소
+- target : 링크의 대상을 지정하는데 사용. default는 _self 값을 가진다.
+
+---
+	
+- 태그 a의 target 속성이 주로 가지게 되는 값 
+
+_self: 링크를 클릭 시, 현재 창에서 페이지가 로드.
+_blank: 링크를 클릭 시, 새로운 탭이나 창에서 페이지가 로드.
+_parent: 현재 프레임의 부모 프레임에서 페이지가 로드.
+_top: 현재 프레임의 최상위 프레임에서 페이지가 로드.
+
+---
+
+div 내 p 태그를 찾을 때, 동일 관계에 있는 자식들의 순서를 기준으로 번호가 매겨진다.
+```
+    <div>
+        <p>HTML5, CSS3 Document</p>
+        <p>To. all member</p>
+        <p>html5, CSS3 study is very easy html5, CSS3 study is very easy html5, CSS3 study is very easy</p>
+        <p>From. SBA</p>
+        <hr />
+        <p><a href="http://sba.seoul.kr" target="_blank">서울산업진흥원</a></p>
+    </div>
+```
+
+예시가 다음과 같을 때, 마지막 p태그에 CSS문법을 적용시키려면
+p의 5번째가 아니라, div 내 동등관계의 요소들의 6번째라고 생각하여 숫자를 입력해야 한다.
+
+```
+	div p:nth-child(6){
+            
+        }
+```
+---
+
+position
+- 위치를 설정하는 속성
+- 가질 수 있는 값들의 종류. default는 static.
+	- absolute : 좌표 기준으로 배치. 
+		- 좌표의 기준은 웹 브라우저 상 좌표가 아니라, 부모 요소가 기준이 된다.
+	- static : 기본 값. 문서 흐름에 따라 배치됨
+		- top, right, bottom, left와 같은 위치 속성 무시됨
+	- fixed : 절대좌표를 의미한다. 뷰포트(브라우저 창)를 기준으로 배치.
+		- 스크롤해도 항상 같은 위치에 고정
+	- relative : 상대좌표. static 상태일 때의 위치(default 값)를 기준으로 잡는다.
+		- 타 요소들에 영향을 주지 않고 오로지 자기 위치를 기준으로 위치 속성에 따라 이동됨.
+
+---
+
+개발자들이 관습적으로 외우는 부분
+- margin : 0 auto;
+- height : 100px -> line height:100px 이면 수직으로 가운데 정렬
+- 부모 요소의 position : relation -> 자식 요소의 position : absolute가 제대로 적용 
+
+---
+
+float
+- 대상을 띄운다.
+- 띄워야 하는 대상을 띄움으로서, 컨텐츠는 피해서 보이게끔 들어가는 것.
+- float로 띄운 대상
+	- 부모 요소는 overflow : hidden을 통해, 띄워진 자식 요소를 인식
+	- float된 대상 이후 요소는 영향을 받고 싶지 않다면, clear : both 를 통해 띄워진 대상 인식
+
+---
+
+앞으로 배우게 될 것들
+- 반응형 디자인
+- flexible
+- 부트 스트랩
+
+---
+
+
