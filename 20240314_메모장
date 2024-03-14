@@ -1,0 +1,42 @@
+DTO와 VO의 차이
+https://maenco.tistory.com/entry/Java-DTO%EC%99%80-VO%EC%9D%98-%EC%B0%A8%EC%9D%B4
+
+부트 스트랩 참조는 언제나 옳다.
+https://getbootstrap.kr/docs/5.3/getting-started/introduction/
+
+update 부분이 번거로운 이유는, 게시글 하나의 데이터를 뽑아온 다음에 수정하는 과정이 들어가야 하기 때문.
+물론, 세션에 따라 수정 버튼이 활성화되는 게 차라리 간편하지만 
+로그인 구현 안했 ... (할 말이 없네.)
+
+MVC 모델 패턴을 좀 알고 있어야 한다.
+
+- scriptlet 내 변수는 자바 메모리에 저장된 것이고, el로 부르는 변수는 jsp scope 영역에서 호출하는 것. 
+아 물론 jsp 자체가 java 파일(정확히 말하면 servlet 파일)로 변동되니까 같은 거 아니냐 할 수도 있는데
+메모리 저장 영역 자체가 다르기 때문에, 
+
+<% int num = 1; %>
+${num} 
+
+위와 같은 호출은 안된다. 
+
+이 참에 자바 메모리 영역이랑 
+jsp의 메모리 영역을 공부하자. 
+
+https://lucas-owner.tistory.com/38 - 자바 메모리 영역 검색 후 나오는 사이트
+
+https://javabeater.tistory.com/28 - jsp 내장 객체 검색 후 나오는 사이트
+
+Heap 영역에 저장된 변수를 불러야 하는데, pageScope 영역에 있는 데이터를 호출하고 있음.
+-> 되겠니? 안됨.
+
+jstl 표준 라이브러리.. 자주 사용하는 c만 놓으려다 하나 더 놓음. 보통 사이트에선 5개 정도 소개하던데...
+그냥 2개만... 
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
+다른 것보다 View가 제일 화나. 
+근데 자바 스크립트는 내일(3월15일)에 배운다고. 아....
+
+sql문도 다 까먹은 거 같다. 앙대!
+
