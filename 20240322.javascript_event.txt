@@ -1,0 +1,202 @@
+20240322 javascript_event
+
+---
+
+개발자들은 독특한 코딩방식보다는 정석적인 코딩방식을 고수하는 경향이 있다.
+
+---
+
+```
+		for(let num in lotto.getNums()){
+                        
+                }
+```
+```
+		for(let num of lotto.getNums()){
+                        
+                }
+```
+
+위 경우에서는 
+
+in 키워드 : 인덱스가 넘어옴
+of 키워드 : 값이 넘어옴
+
+---
+
+문자열 내 ""가 있을 땐 ''으로 묶어주자.
+문자열 내 ''가 있을 땐 ""으로 묶어주자.
+-> 맨 가장자리에 있는 따옴표의 내부 내용을 문자열로 인식.
+
+---
+
+자바스크립트의 이벤트 구조
+- 사용자가, page에서 어떠한 상호작용을 할 때 발생하는 것.
+-> 자바스크립트 코드 실행
+-> 페이지에 변화가 생김.
+
+이벤트
+- 상호작용. 누구와 누구?
+-> 웹 브라우저와 사용자 간 상호작용.
+- 특정 동작을 했을 때, 이벤트 객체를 던져주겠다는 것.
+
+이벤트와 관련해 알아야 되는 것
+- 이벤트를 발생시킬 수 있는 특정 동작이 무엇인가?
+- 이벤트 객체를 만드는 방법은 무엇인가?
+
+---
+
+script 태그를 밑에 넣는 경우도 꽤 많다고.
+-> onload를 활용하지 않는 것
+
+---
+
+자바스크립트 활용 이유 
+- 이벤트 작성 및 활용을 위해.
+
+---
+
+handler 
+- 개발자들이 이벤트의 callback 함수라는 것을 표현하기 위해, 이벤트 관련 함수명에 자주 가져다 붙인다고 한다.
+
+---
+
+MS 핸들러 모델은 안 쓴다고 한다.
+-> 표준 핸들러 모델을 사용한다고 한다.
+
+---
+
+콜백함수 
+- 다른 함수의 인자로 전달되는 함수
+
+---
+
+함수 참조 : 함수 자체를 식별하고, 해당 함수를 나중에 호출할 수 있도록 참조하는 것
+
+---
+
+이벤트 객체에서의 this
+-> 이벤트가 발생한 객체를 의미
+
+---
+
+자바스크립트의 this는 하나의 의미만 가지고 있는게 아니다.
+
+자바에서의 this는 객체 자기 자신을 의미하는 걸로 끝.
+
+---
+
+자바스크립트에서의 this는 호출한 놈이라고 이해하는 게 제일 정확하다고.
+-> 호출한 객체라는 표현이 정확함. 
+
+---
+
+div : division의 약자
+p : paragraph의 약자
+
+---
+
+```
+	function addHandler(e){
+            console.log("click event!");
+            console.log("this : " + this);
+	    console.log(this);
+            console.log(e);
+        }
+
+	var objDiv = document.querySelector("#objDiv");
+        objDiv.addEventListener("click", addHandler);
+```
+
+각각의 객체에 대해, 똑같은 함수를 집어넣을 수 있다.
+e는 PointerEvent 객체를 의미.
+-> PointerEvent : 마우스 클릭 이벤트 발생 시, 해당 이벤트 정보를 저장하는 이벤트 객체.
+-> 웹 브라우저가 해당 객체를 던져주는 것.
+
+- addEventListener()에 들어가는 첫 인자는 태그 내 이벤트 속성에서 'on'을 뺀 값이라고 한다.
+
+- 콘솔창
+```
+click event! 											11- 이벤트-이벤트this.html:40  
+this : [object HTMLDivElement] 								11- 이벤트-이벤트this.html:41  
+<div id="objDiv">object Division</div> 						11- 이벤트-이벤트this.html:42  
+PointerEvent {isTrusted: true, pointerId: 3, width: 1, height: 1, pressure: 0, …} 11- 이벤트-이벤트this.html:43  
+```
+this는 호출한 객체를 가리키므로, objDiv를 가르킨다고 보면 된다. 
+(호출한 객체를 참조한다.)
+
+---
+
+자바스크립트의 
+
+인라인 모델(Inline Model):
+
+HTML 요소가 수평으로 배치되는 모델입니다.
+인라인 요소는 다른 요소와 함께 한 줄에 표시되며, 요소의 크기는 해당 내용의 크기에 따라 유동적으로 조정됩니다.
+인라인 요소의 예로는 <span>, <a>, <img> 등이 있습니다.
+인라인 요소는 width와 height 속성을 가질 수 없으며, 여백과 패딩을 조정하기 위해 margin과 padding 속성을 사용합니다.
+
+표준 모델(Standard Model):
+
+HTML 요소가 상자 모델(Box Model)에 따라 수직으로 쌓이는 모델입니다.
+표준 요소는 다른 요소 위 또는 아래에 배치될 수 있으며, 요소의 크기는 지정된 너비와 높이에 따라 결정됩니다.
+표준 요소의 예로는 <div>, <p>, <header>, <footer> 등이 있습니다.
+표준 요소는 width, height, margin, padding, border 등의 속성을 사용하여 크기와 공간을 조정합니다.
+
+-> 결국 inline tag와 block tag의 설명과 일치한다고 보면 됨. 
+
+---
+
+form 태그 컨트롤하기
+- type이 button인 버튼을 클릭하여 폼 내용을 전송한다고 가정하면, 기존에 활용했던 방식대로 이벤트 속성을 통해 진행
+-> submit을 진행할 경우, 폼 객체를 받아 submit() 진행
+
+- type이 submit인 버튼을 클릭하여 폼 내용을 전송한다고 가정하면, form에 있는 onsubmit에 익명 함수를 할당하고 return 값을 true, false 반환한다.
+
+---
+
+html
+- input
+- radio
+- select
+- check 
+등등등... 모든 요소들을 관리할 수 있다.
+
+---
+
+이벤트 등록 방법 중 인라인 모델 방식보다는, 표준 모델을 권장하는 편
+- 표준 모델로 하는 개발자가 많다고 볼 수는 없다고...
+
+---
+
+checkbox 태그의 특징 
+- 2개 이상 끌고 올 수 있다는 점.
+
+---
+
+checkbox의 checked 속성은 객체 내에서 true, false 값을 가진다.
+
+---
+
+이벤트 시점에 즉시 반영시키기 위한 코드1
+
+- body 위쪽에 script를 놓고 싶다!
+
+```
+document.addEventListener("DOMContentLoaded", function (){
+	// 실행 내용
+});
+```
+이벤트 리스너에, DOMContentLoaded 를 이용하여 실행한다.
+
+- 스크립트가 실행되는 시점을 늦추는 방법을 사용한 것.
+- 이를 위해 일반적으로 DOMContentLoaded 이벤트를 사용. 
+-> 이 이벤트는 HTML 문서의 모든 요소가 로드되고 파싱된 후에 발생.
+-> HTML 요소들이 이미 로드되어 있는 상태에서 이벤트를 진행하는 것.
+-> 요소들을 안전하게 선택할 수 있음
+
+- body 이후에 script를 놓는다면?
+DOMContentLoaded 없어도 실행 가능.
+
+---
+
