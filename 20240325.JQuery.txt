@@ -1,0 +1,255 @@
+20240325 JQuery
+
+---
+
+웹 프로그래밍할 땐 jsp/servlet 이 표준이다.
+-> 프레임워크라 표현하든지, 라이브러리라 표현하든지 ... 
+
+---
+
+javascript 기반으로, 사용자가 좀 더 사용하기 쉽게 만든 것이 jquery
+- 라이브러리.
+- 자주 사용하는 기능을 감싸서 쉽게 사용할 수 있도록 만듦(캡슐화)
+- javascript의 단점(DOM 관련 기능의 경우에는 브라우저 이슈가 있다는 것) 상쇄 : DOM 기능을 어디서든 사용 가능
+
+---
+
+jquery 사용 방법
+- 다운로드
+- CDN 
+
+- 은행권 등에서는 인터넷에서 다운로드받는 것을 금지하기 때문에, CDN이 금지된다. 
+-> CDN 방식이 링크를 타서 다운로드받는 방식이라 사용하는 코드가 직접적으로 노출이 될 수 있음. 노출되지 않는 방식을 추구하는 것.
+
+- 다른 프로젝트의 경우라면 CDN 써도 괜찮을 것.
+
+---
+
+jquery 사용 방식
+```
+// $ 활용 
+$(선택자).함수명(매개변수) ;
+
+// jQuery 활용
+jQuery(선택자).함수명(매개변수) ;
+```
+
+$(선택자).함수명(매개변수) ;
+- 제이쿼리에서 제공하는 객체와 함수로 DOM 객체를 다룬다는 것
+
+document.querySelector(); 
+- 자바스크립트에서 제공하는 객체와 함수로 DOM 객체를 다룬다는 것.
+
+---
+
+개발자들은, window.onload 보다는 $(document).ready()를 더 많이 활용한다.
+
+- document 객체를 제이쿼리로 감쌌다. 
+-> document 객체는 브라우저에서 제공하는 내부 객체이다. 선택자가 아니다.
+-> document 객체를 감싸서 jquery document 객체를 만드는 것.
+-> DOM 객체에 jquery 함수를 활용하겠다는 의미.
+--> 함수명이 다를 순 있다. 어찌 보면 당연한 거지만...
+
+---
+
+window.onload  의 특징 
+- 콜백함수를 등록하게 되어 있음
+- 여러 번 호출하여 콜백함수를 등록하게 될 경우, 마지막에 작성한 부분만 적용된다. 
+-> onload에 들어가는 값이 함수인 것.
+
+$(document).ready()
+- 사용법 : ready함수에 콜백함수를 등록하면 된다.
+
+---
+
+선택자의 경우, css 선택자들을 활용해주면 된다.
+```
+      $(document).ready(function(){
+         jQuery("*").css("fontSize","1.1em");  
+         $("li").css("color","#0000ff"); // 태그 선택자
+         $("#item").css("background","#ffff00").css("width","300px"); // 아이디 선택자
+         $(".seoul").css("background","#ff0000"); // 클래스 선택자
+         $("#wrap p").css("border","2px solid #cccccc"); // 후손 선택자
+         $("#wrap > p").css("border","2px solid #cccccc"); // 자손 선택자
+      });
+```
+
+---
+
+```
+         $("input[type='password']").css("color","#0000ff"); // 속성 선택자
+         $("input:submit").css("fontSize","1.2em"); // 필터 선택자
+         $("li:nth-child(2n+1)").css("background","#ffff00"); // 함수 선택자
+```
+
+선택자들 중, (괄호 내용은 예시)
+- 속성 선택자 : 요소의 속성 값 (type이 password)
+- 필터 선택자 : 요소의 특정 조건 (input 요소가 submit될 때)
+- 함수 선택자 : 요소의 특정 조건 (li가 홀수번째 요소인 경우)
+
+---
+
+jquery의 객체 생성 방식
+
+1. 태그 내용 그대로 다 넣기
+```
+let divObj = $("<div>hello jQuery!</div>");
+```
+
+2. 태그명으로 객체명을 정하고, 태그에 적용시킬 속성과 값을 할당해놓은 객체를 대입
+```
+	let tempObj = {
+            src : "img/arm_mbed.png",
+            width : 297,
+            height : 124,
+            border : "5px",
+         }
+
+         let imgAObj = $("<img>", tempObj);
+```
+
+---
+
+객체 삽입
+- append : 부모.append(자식)
+- appendTo : 자식.append(부모)
+
+- prepend : 부모.prepend(자식) - 부모의 첫 번째 자식으로 넣기
+- prependTo : 자식.prependTo(부모) 
+
+객체 추가
+- after : A.after(B) - A 다음에 B 놓기
+- insertAfter :  B.insertAfter(A)
+
+- before : A.before(B) - A 이전에 B 놓기
+- insertBefore : B.insertBefore(A) 
+
+---
+
+해당 부분을 자바스크립트로 처리하려고 하면 엄두가 안나는 경우가 있다.
+jquery로는 금방 해결이 가능하다.
+
+---
+
+DOM 객체 
+
+---
+
+dom의 요소를 가리키는 용어들
+- node : DOM의 구성요소
+- element : DOM에서 실제로 표시되는 HTML 요소를 말함.
+-> element도 node에 속한 것들 중 하나다.
+
+---
+
+객체 복제
+- clone()
+
+---
+
+```
+      ($("#wrap > .contents1 > .p").clone()).appendTo($("#wrap > .contents1"));
+      ($("#wrap > .contents2 > .p").clone()).appendTo($("#wrap > .contents2"));
+```
+해당 예시의 경우, 세미콜론을 넣지 않으면 에러가 발생한다.
+이유는 ($("#wrap > .contents1 > .p").clone()) 이렇게 괄호로 추가로 감싸서 그런 거 같다. 
+해당 코드의 외곽에 있는 괄호를 없애면 세미콜론이 없어도 에러가 발생하지 않는다.
+
+---
+
+기본 메서드
+
+- each() 
+	- 중복된 요소들을 가져올 때 사용하는 함수
+	-> each에 callback 함수를 구현한다..
+```
+$(selector).each(function(index, element) {
+    // 각 요소에 대한 작업 수행
+});
+``` 
+	- 내부적으로는 제이쿼리가 각각의 객체에 함수를 연결.
+	-> p 태그에서 호출하는 방식
+	-> this 키워드를 사용해도 각각의 element 객체가 호출되고, element를 사용해도 각각의 객체가 호출되도록 만든 거 같다.
+
+- html(), text() 
+	- jquery 를 쓰는 주요한 이유 중 하나.
+	- 요소 내부에 있는 것들을 가져온다.
+	- html()은 모든 자식 태그들을 가져온다. 
+	- text()는 텍스트만 가져온다.
+
+	- 매개변수가 없는 html()의 경우에 해당된다.
+
+	-> html(내용) 처럼 인자를 받는 경우에는, 해당 내용을 출력한다.
+	```
+	$("#htmlMethod").html("안녕하세요</br>");
+	```
+	-> #htmlMethod 내부의 내용을 "안녕하세요</br>"로 세팅한다.
+	-> html()은 매개변수 유무에 따라 setter 나 getter를 활용하는 방식으로 만들어졌다고 보면 된다.
+	-> text(내용)도 html(내용)과 동일하지만, text는 텍스트를 내보내기 때문에 태그를 같이 쓰면 문자열로 같이 출력된다.
+
+- addClass()
+	- 클래스 속성 추가
+
+- removeClass()
+	- 클래스 속성 제거
+
+- attr() 
+	- 속성 추가 
+	```
+	$("#attrMethod img").attr("src","img/logo.png");
+	```
+	- 해당 방식으로 속성명, 속성값을 넣을 수 있다.
+	- 속성명만 넣을 경우, 현재 해당 속성에 할당되어 있는 속성값을 리턴한다.
+
+- removeAttr() 
+	- 속성 제거
+
+- css() 
+	- CSS 속성 추가
+	- 한 객체에 계속 css()를 줄 수 있다. 물론, 한 줄에 너무 많이 호출하는 건 지양하는 것이 좋다.
+
+- remove() 
+	- 객체 제거
+
+- empty()
+	- 객체 내부 제거
+
+이외에도 여러가지 메서드가 있다.
+필요할 때 찾아보기.
+
+---
+
+자바스크립트 이벤트 방법
+
+1. inner method
+2. 객체.속성 = function(){}
+3. X
+4. addEventListener()
+
+---
+
+github 소스트리 쓰기
+- 조장이 깃허브 add 시켜주면 된다고.
+
+---
+
+2차 프로젝트
+- 2주
+-> 4월 8일까지 하고 조장이 발표
+총 4개 다 하는 방식인 거 같다.
+
+- 부트스트랩 활용하기
+- CSS를 활용해도 상관없음
+
+- 게임을 만들어도 상관없음
+- 너무 빨리 할 필요까진 없다.
+
+- 팀 프로젝트이기 때문에 서로 합의하기
+
+
+조건 
+- MVC2로 짜기
+- github로 관리하기
+
+--- 
+
