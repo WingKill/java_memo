@@ -1,0 +1,158 @@
+20240401 Spring 
+
+---
+
+```
+        String configLocation = "classpath:appCTX.xml";
+        
+        AbstractApplicationContext ctx = new GenericXmlApplicationContext(configLocation);
+```
+
+- classpath:appCTX.xml은 클래스패스(classpath) 상에 위치한 appCTX.xml 파일을 의미.
+-> 이는 스프링 설정 파일의 경로를 나타냄.
+- AbstractApplicationContext는 스프링의 애플리케이션 컨텍스트를 나타내는 추상 클래스.
+- 이 클래스를 상속하여 구현한 구체적인 클래스로 GenericXmlApplicationContext를 사용하고 있음. 
+-> 이 클래스는 XML 파일 기반의 애플리케이션 컨텍스트를 생성.
+-> 스프링 컨테이너 생성
+
+---
+
+제공하는 문법이, 내부적으로 이해해줘야 하는 문법이라 힘들 것.
+단순히 클래스명만 외우고 호출하여 사용하는 정도가 아니라고 함.
+
+---
+
+```
+	<bean id="myCalculator" class="edu.sejong.ex.MyCalculator">
+		<!-- myCalculator.setFirstNum() -->
+		<property name="firstNum" value="10"></property>
+		<!-- myCalculator.setSecondNum() -->
+		<property name="secondNum" value="2"></property>
+		
+		<property name="calculator">
+			<ref bean="calculator"/>
+		</property>
+	</bean>
+```
+
+xml 파일에서, property는 setter함수를 호출하는 것이다.
+ref는 bean의 id를 통해 다른 bean 객체를 참조하는 것이다.
+bean 태그를 통한 bean 객체 생성은, 클래스 내 default 생성자를 활용한다.
+-> 다른 형태의 생성자는 있는데, default 생성자가 없다면 에러를 발생시킨다.
+
+---
+
+```
+		<property name="hobbys">
+			<list>
+				<value>수영</value>
+				<value>요리</value>
+				<value>독서</value>
+			</list>
+		</property>
+```
+배열 초기값을 할당할 땐 해당 방식처럼 list와 value태그를 활용한다.
+
+---
+
+작은 규모의 프로젝트에서는 spring DI보다는 일반적인 방법을 사용하는 것이 더욱 빠르고, 스트레스를 줄일수 있음.
+
+DI 사용의 장점
+- 규모가 어느 정도 커지게 되면
+-> 상용을 얘기하는 것
+- 서비스가 계속 진행되어야 하는 프로그램
+
+- 초기 개발자들은 사라지고, 이후 오게 되는 개발자들이 유지 보수를 진행해야 한다.
+-> 이 부분에서 문제점이 발생하게 되는 것.
+
+
+- 추후 유지보수 업무 발생 시 유용하다.
+
+---
+
+현업에서는 자바를 이용해서 개발한다는 것보다는, 프레임워크를 사용하여 개발한다는 게 맞다.
+
+---
+
+- Spring DI의 경우에는, 설정하는 부분과 코딩하는 부분이 나뉘어져 있다.
+
+어째서 xml 설정하는 부분을 지원하는가?
+
+- 설정 : 서버 관리자가 관리
+	- 최대한 코딩에 손 안대고, 설정으로 수정할 수 있도록 만들어야 한다.
+	-> 유지보수 비용을 아낄 수 있음
+- 코딩 : 프로그래머가 관리
+	- 코딩이 길어지게 되면 어떤 오류가 발생할지 모른다.
+
+---
+
+유지보수가 없으면 개발자들은 일거리가 없다고.
+- AI가 나온다 한들.. 현재 사용되고 있는 spring 프레임워크 개발을 지원하는 방식으로 될 것이라고 예측
+
+---
+
+자격증은 준비한다면 정보처리기사부터.
+
+---
+
+프로젝트는 코딩 문제보다는, git으로 공유 시 발생하는 문제가 상당히 많다.	
+- 명령어를 통한 문제 해결은, 터미널 부분을 활용하면 된다.
+
+---
+
+DI 설정 방법
+- XML
+- JAVA
+
+---
+
+생성자에 인자를 대입하여 빈 객체를 생성하고 싶다면 .xml 파일에 다음과 같이 태그를 설정한다.
+
+만약 클래스가 다음과 같은 생성자를 가지고 있는 경우
+```
+	public Student(String name, int age, ArrayList<String> hobbys) {
+		this.name = name;
+		this.age = age;
+		this.hobbys = hobbys;
+	}
+```
+아래와 같이 <constructor-arg></constructor-arg>를 활용한다.
+```
+	<bean id="student1" class="edu.sejong.ex.Student">
+		<constructor-arg value="홍길동" />
+		<constructor-arg value="10" />
+		<constructor-arg>
+			<list>
+				<value>수영</value>
+				<value>요리</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+```
+
+---
+
+IOC container : 스프링
+해당 컨테이너에 객체를 생성해준다.
+
+Spring이 관리하는 객체와 JVM이 관리하는 객체는 다르다.
+- 그래서 자바에서 getBean()를 사용하게 되면, 스프링에서 관리하는 객체의 주소값을 참조하게 된다.
+
+```
+    	ctx = new GenericXmlApplicationContext("classpath:appCTX4.xml","classpath:appCTX5.xml");
+    	Student student1 = (Student) ctx.getBean("student1");
+    	System.out.println(student1.getName());
+    	System.out.println(student1.getHobbys());
+    	
+    	StudentInfo studentInfo = (StudentInfo) ctx.getBean("studentInfo1");
+    	Student student2 = studentInfo.getStudent();   	
+    	
+    	if(student1 == student2) {
+    		System.out.println("같습니다.");
+    	}
+```
+해당 부분에서, 'student1 == student2'는 두 객체에 담긴 주소값이 서로 같은지 비교하는 것이다.
+
+---
+
