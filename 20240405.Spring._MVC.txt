@@ -1,0 +1,246 @@
+20240405 Spring데이터전달방법_MVC모델
+
+---
+
+데이터(커맨드) 객체
+- 내부적으로, 해당 객체에 형변환 및 데이터 전달하는 것을 자동으로 진행해준다.
+- @RequestMapping과 같은 mapping annotation이 가지는 기능이라고 보면 된다.
+
+커맨드 객체를 적어주게 되면, 기본적으로 컨테이너 안에서 주입을 시켜줄 때 default 생성자를 이용한다.
+default 생성자를 이용한 다음, setter 함수를 호출하는 방식으로 데이터를 넣는다.
+-> 컴파일러가 default 생성자를 자동으로 생성할 수 없는 상태인데, default 생성자가 없다면 에러가 발생한다.
+-> 커맨드 객체로 사용할 클래스에 생성자를 여럿 만들개 될 때는 default 생성자를 반드시 만들어줘야 한다.
+
+form을 통해 받는 파라미터의 양이 많다면, 커맨드 객체를 자주 활용하게 된다.
+
+---
+
+lombok을 활용한 클래스 내에서도 충분히 함수를 만들 수 있다.
+(lombok을 활용해 생성자들, getter, setter를 만든 경우)
+
+---
+
+	
+- 경로에 변수를 넣어 요청메서드에서 파라미터로 사용 가능
+
+- RESTful 서비스가 제안되고 나서 만들어진 annotation이라고 말씀하신 듯.
+- 대다수의 프레임워크에서 해당방식으로 지원된다고 하던데..
+
+```
+	//http://localhost:8282/path?student=10
+	//http://localhost:8282/path/student/10
+	@RequestMapping("/student/{id}")
+	public String student(@PathVariable String id, Model model) {
+		System.out.println("student()..");
+		model.addAttribute("studentId", id);
+		return "student";
+	}
+```
+
+http://localhost:8282/path?student=10
+대신 
+http://localhost:8282/path/student/10
+의 형태로 변형시키는 걸 제안한 것이라 보면 됨. 
+
+GPT 답변
+-> @PathVariable 애너테이션은 스프링에서 RESTful 웹 서비스를 개발할 때 사용되는 중요한 애너테이션 중 하나라고 함.
+
+- 사용 시 변수명과 메서드의 파라미터명이 동일해야 한다.
+(예시1 형태일 경우에 한함.)
+원래 예시2의 형태로 해줘야 하지만, 더 축약한 형태가 예시1이라고 한다.
+
+예시2에서는 에너테이션에서 이미 일치시키는 과정을 밟고 있으므로, 이후 받는 메서드 파라미터명은 다르게 해도 된다.
+
+예시1
+```
+	@RequestMapping("/student/{id}")
+	public String student(@PathVariable String id, Model model) {
+		System.out.println("student()..");
+		model.addAttribute("studentId", id);
+		return "student";
+	}
+```
+예시2
+```
+	@RequestMapping("/student/{id}")
+	public String student(@PathVariable("id") String studentId, Model model) {
+		System.out.println("student()..");
+		model.addAttribute("studentId", studentId);
+		return "student";
+	}
+```
+
+---
+
+@RequestMapping 에서 get방식, post방식 설정하기
+
+- Get
+	- @RequestMapping(method = RequestMethod.GET, value = "/student")
+	- @GetMapping("/student")
+- Post
+	- @RequestMapping(method = RequestMethod.POST, value = "/student")
+	- @PostMapping("/student")
+- 2개 다 받아내고 싶다면 @RequestMapping("/student")
+
+---
+
+@ModelAttribute 
+	- Model 객체를 받는 과정 및 함수 사용 과정을 처리하는 에너테이션
+	- 내부적으로 model.addAttribute()을 호출한다.
+	-> 자주 활용되는 에너테이션 중 하나
+
+1번
+```
+	@PostMapping("/studentView")
+	public String studentView(StudentInformation studentInformation, Model model) {
+		System.out.println("studentView()..");
+		model.addAttribute("studentInformation", studentInformation);
+		return "student/studentview";
+	}
+
+```
+2번
+```
+	@PostMapping("/studentView")
+	public String studentView(@ModelAttribute("studentInfo") StudentInformation studentInformation) {
+		System.out.println("studentView()..");
+		return "student/studentview";
+	}
+```
+
+---
+
+웹 프로그래밍에서 질문하게 되는 4가지
+- get, post
+- session, cookie
+- 4개의 scope
+- forward, redirect
+
+---
+
+면접 부분에서 유리한 고지를 잡으려 한다면, 이론적 설명에 코드를 연결하는 게 좋다.
+
+---
+
+Spring 내 MVC 모델 짤 때 사용하는 annotation
+
+M : @Service + @Repository
+V : .jsp 파일들
+C : @Controller
+
+@Controller - controller
+@Service - command
+@Repository - DAO
+
+---
+
+@Repository
+	- 해당 부분은 Mybatis, JPA 등의 솔루션이 있다고 한다.
+
+---
+
+- SpringWeb (중요)
+	- 웹 서비스를 만드는 데 가장 중요한 모듈이다. 
+	- 내장 톰캣 뿐 아니라 Spring MVC 패턴을 구현하는 데 필요한 기능이 대부분 들어있다. REST API서버를 만든다면 필수이다.
+
+- Spring Boot DevTools (취향에 따라 사용)
+	- DevTools는 스프링 어플리케이션을 띄웠을 때, 재시작하지 않고 코드의 변화를 반영시킬 때 사용한다. 
+	- HTML 파일의 경우 LiveReload 기능을 제공하여 저장하면 그 변화가 페이지에 바로 나타나게 할 수도 있다. (참고  velog.io/@bread_dd/Spring-Boot-Devtools)
+
+---
+
+pom.xml 에 오라클 추가
+
+1. repository 접근
+```
+	<repositories>
+		<repository>
+			<id>oracle</id>
+			<url>http://www.datanucleus.org/downloads/maven2/</url>
+		</repository>
+	</repositories>
+```
+
+2. dependency 접근
+```
+		<!-- 오라클 JDBC 드라이버 -->
+		<dependency>
+			<groupId>oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>11.2.0.3</version>
+		</dependency>
+```
+
+- 특수 상황이나 접속이 몰리는 상황 등으로 인해, 해당 library 다운로드가 되다가 멈춰버리면 에러를 잡을 수 없음.
+-> 기존 라이브러리를 지우고 다시 설치해야 하는 상황이 나옴.
+-> 그 상황을 막기 위해, 우리 반의 경우에는 4명씩 나눠서 다운로드를 진행했음.
+
+---
+
+DB는 설정이 절반.
+
+---
+
+application.properties 파일(설정 파일) 수정
+
+- DB Connection Pool 설정
+
+```
+#datasource (oracle)
+spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521/xe
+#spring.datasource.driver-class-name=net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+#spring.datasource.url=jdbc:log4jdbc:oracle:thin:@localhost:1521/xe
+spring.datasource.username=scott
+spring.datasource.password=tiger
+```
+
+---
+
+오후에 진행한 db 관련 작업 순서
+pom.xml 
+-> application.properties
+-> vo 만들어보기
+-> test하기
+
+-> dao 
+
+---
+
+인터페이스 만들기
+```
+package edu.sejong.ex.repository;
+
+import java.util.List;
+
+import edu.sejong.ex.vo.DeptVo;
+
+public interface DeptRepository {
+	public List<DeptVo> selectList();	
+}
+```
+
+인터페이스를 구현한 클래스 만들기
+```
+package edu.sejong.ex.repository;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import edu.sejong.ex.vo.DeptVo;
+
+@Repository
+public class DeptRepositoryImpl implements DeptRepository{
+	
+	@Override
+	public List<DeptVo> selectList(){
+		return null;
+	}
+}
+```
+
+-> repository 구조를 짠 상태로 수업 마무리.
+
+---
+
