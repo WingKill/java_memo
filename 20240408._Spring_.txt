@@ -182,5 +182,14 @@ JUnit Test Case : 단위 테스트
 
 @Service
 	- @Component + 의미(Command) = 비지니스 로직
-	- 
+
+---
+
+@Controller
+	- 컨트롤러 테스트는 기존에 비해 좀 더 복잡함
+
+---
+
+
+
 
