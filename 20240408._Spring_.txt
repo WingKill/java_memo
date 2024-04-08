@@ -1,0 +1,186 @@
+20240408 발표느낀점_Spring_데이터연결
+
+---
+
+프로젝트 발표를 보면서 느낀 점
+- 코드 관련 설명
+- 화면 설명을 영상으로 하느냐, 스크린샷으로 하느냐의 차이가 있었음
+- 팀 프로젝트는 무조건 초반에 합의점을 충분히 두고 해야 한다. 
+	-> 그렇지 않으면 화면 구성이 다르거나 중복된 파일을 만드는 등의 문제점 발생
+- PPT 꾸미기에 좀 신경을 쓰긴 해야 겠다.
+- 발표용 자료냐 포트폴리오냐의 느낌이 들었음
+	- 텍스트 설명이 많이 들어갈 수밖에 없다는 것을 파악하기
+	- 발표용이야 텍스트를 조금 줄이고, 보여줄 이미지나 영상을 크게 보여주는 편이 많지만
+	  포트폴리오 구성에는 그 방식만 고집하면 안된다는 점...
+- 확실한 건, 디자인 감각 있는 사람에게 ppt 맡기는 게 훨씬 낫겠다.
+
+- 주의 사항은 반드시 전달해야겠다.
+
+---
+
+@Repository 
+	- @Component + 의미(DAO)
+
+@Component
+	- Spring IOC container 안에 객체를 생성하라는 의미
+	-> Spring IOC container에서 관리하겠다는 의미.(Spring이 제공하는 기능을 사용하겠다는 의미.)
+
+---
+
+test 파일을 만드는 이유
+	- 실무에서 남기도록 요구함
+	- 해보면 상당히 편함
+
+- JDBC Connection 관련 Test 진행
+	
+---
+
+선생님 의견
+- 프로그래머는 가늘고 길게 가는 게 좋다
+	- 프레임워크 하나 잡고 쭉 가면 된다고 
+	- 현업에서 50~60세까지 쭉 있는 경우가 그렇다고 
+
+---
+
+Test 진행 시, 주석 집어넣으라고 함..
+
+---
+
+JDBCConnectionTest
+```java
+package edu.sejong.ex.database;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+import org.junit.jupiter.api.Test;
+
+class JDBCConnectionTest {
+
+	@Test
+	void testConnection() {
+		// 1. DB접속
+		// Connection 클래스
+		Connection conn = null;
+		
+		// 2. 연결 문자열 생성
+		// - 접속에 필요한 정보로 구성된 문자열. Connection String
+		// - localhost 대신, ip주소가 들어갈수도 있음
+        String url = "jdbc:oracle:thin:@localhost:1521:xe"; 
+        String id = "scott";
+        String pw = "tiger";
+        
+        // DB작업  > 외부 입출력 > try-catch 필수
+        try {
+			// 3. JDBC 드라이버 로딩
+        	Class.forName("oracle.jdbc.driver.OracleDriver");
+        	        	
+        	// 4. 접속
+        	// - Connection 객체 생성 + 접속 작업
+			conn = DriverManager.getConnection(url,id,pw);
+			// 접속 중(false), 접속종료(true)
+			System.out.println(conn.isClosed()?"접속종료":"접속중");
+			
+			// 5. SQL
+			
+			// 6. 접속종료
+			conn.close();
+			// 접속 중(false), 접속종료(true)
+			System.out.println(conn.isClosed()?"접속종료":"접속중");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+```
+
+---
+
+Connection Pool 
+	- 미리 생성해놓은 Connection 객체 군집
+	- 어디서 해당 객체를 생성해 놓는가? -> 서버(Tomcat)
+
+---
+
+웹 프로그래밍을 하려면
+	- 기본적으로 웹 서버가 필요하다.
+		- 내부적으로 소켓 등을 활용한 데이터 연결 처리를 해준다.
+		- 이게 없다면 직접 웹서버를 짜야 한다...
+		- 웹 서버 종류 : Tomcat, 제우스, 웹로직 등
+	- 스프링에서는 웹서버를 내장하고 있다.(개발편의성을 위해 넣어뒀음)
+
+---
+
+- 국내에서는 제우스(웹서버) + 티베로(DB) 를 주로 쓴다고.
+	- 웹 서버 + DB (SQL은 리스트 뽑아내는 것이 거의 대부분)
+
+---
+
+@SpringBootTest
+	- 웹 서버를 흉내내는 프로그램이 담겨 있음(웹 프로그래밍 테스트를 위한 웹 프로그래밍 환경 구축)
+	- src/main/에 있는 파일들을 읽어서 테스트한다.
+
+---
+
+jsp/servlet에서는 내장 tomcat이 아니기 때문에, 직접 tomcat에 접근해 context.xml 파일을 수정했다.
+
+spring은 tomcat이 내장되어 있기 때문에, 웹 서버 안에 커넥션 풀(DataSource)을 기본적으로 갖고 있음.
+
+
+Spring에서 DataSource를 가져오기 위한 라이브러리 추가.
+
+```xml
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jdbc</artifactId>
+		</dependency>
+```
+
+---
+
+@Autowired
+	- 의존성 주입 수행
+	- Spring이 해당 타입의 빈을 넣어주는 것
+	- DI(Dependency Injection) 
+	- 사용 방법 : 객체 생성 방법과 유사한 모습을 보인다.
+		- 필드 주입
+		- 생성자 주입
+		- 메서드 주입(Setter)
+	
+---
+
+- 객체 생성 방법
+	1) new : 주입 아님.
+	2) 함수로 가져오기
+		- 생성자 함수
+		- Setter
+
+---
+
+try resource
+
+```
+try(){
+
+}catch(){
+
+}
+```
+
+---
+
+내가 넣는 bean이 어려운 게 아니라, 미리 생성되는 bean을 활용하는 게 어려운 포인트
+	
+---
+
+JUnit Test Case : 단위 테스트
+
+---
+
+@Service
+	- @Component + 의미(Command) = 비지니스 로직
+	- 
+
