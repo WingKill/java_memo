@@ -1,0 +1,185 @@
+20240409 Spring 반복연습 / log 넣기
+
+---
+
+Spring에서 지원되는 게 많다.
+- 테스트 환경은 아무리 봐도 나중에 추가된 test부터 먼저 시작하는 느낌.
+
+테스트 코드 작성 시, 독립적으로 실행될 수 있도록 작성하는 것이 중요
+- 테스트 메서드 A 안에, 또 다른 테스트 메서드 B 를 호출하지 않도록 한다.
+- 테스트 메서드들의 실행 순서는 기본적으로 랜덤이다. 
+
+---
+
+잊고 있었던 것 상기시키기 - button 링크
+<button type="button" onclick="location.href='${pageContext.request.contextPath}/dept/erase?deptno=${dept.deptno}';"></button>
+
+아니면 a 태그에 button 넣던지...
+
+---
+
+```java
+2024-04-09 12:26:19.112  WARN 49076 --- [io-8282-exec-10] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.validation.BindException: org.springframework.validation.BeanPropertyBindingResult: 1 errors<EOL>Field error in object 'empVo' on field 'hiredate': rejected value [2024-04-08]; codes [typeMismatch.empVo.hiredate,typeMismatch.hiredate,typeMismatch.java.sql.Timestamp,typeMismatch]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [empVo.hiredate,hiredate]; arguments []; default message [hiredate]]; default message [Failed to convert property value of type 'java.lang.String' to required type 'java.sql.Timestamp' for property 'hiredate'; nested exception is org.springframework.core.convert.ConversionFailedException: Failed to convert from type [java.lang.String] to type [java.sql.Timestamp] for value '2024-04-08'; nested exception is java.lang.IllegalArgumentException: Timestamp format must be yyyy-mm-dd hh:mm:ss[.fffffffff]]]
+```
+다음 에러는, view 페이지에서 <input type="date">에 담긴 값을 가져오려고 했지만 empVo의 hiredate의 데이터 타입이 Timestamp라 들어가지 못하는 상황이었다.
+즉, controller에 넘어오지 못하는 상황인 것.
+
+해결 방법 
+	- 1. empVo의 데이터 타입을 바꾼다.
+	- 2. 사용자로부터 전송된 문자열 데이터를 컨트롤러에서 받은 후, 해당 문자열을 Timestamp로 변환하는 작업을 수행
+
+2번을 선택.
+-> 따로 문자열 데이터를 넘겨받고 변환하는 작업을 수행해야 함.
+-> empVo의 데이터 타입은 바꾸지 않을 것이므로, Timestamp 타입인 hiredate에 대입하려는 동작을 수행하지 않도록 
+input의 name을 다르게 함. 
+-> 문자열을 Timestamp로 전환하는 작업 수행 후 해당 객체에 대입.
+(에러 처리는 아예 진행하지 않음.)
+
+## 주의할 점
+ new Timestamp.valueOf(hiredate);
+- 이 방식도 안된다. 진행이 안됨. 문자열 형태 갖춰야 한다고 난리를 침.
+
+- 이후 처리하게 된 방식 : LocalDate -> LocalDateTime -> Timestamp
+
+```java
+	@PostMapping("/register")
+	public String register(@RequestParam("hiredatestr") String hiredate, EmpVo empVo) {
+		System.out.println("register()..");		
+		try {
+	        // 문자열을 LocalDate로 파싱
+	        LocalDate localDate = LocalDate.parse(hiredate);
+	        // LocalDate를 LocalDateTime으로 변환 (시간은 자정으로 설정)
+	        LocalDateTime localDateTime = localDate.atStartOfDay();
+	        // LocalDateTime을 Timestamp로 변환
+	        Timestamp timestamp = Timestamp.valueOf(localDateTime);
+	        
+	        System.out.println("변환된 Timestamp 확인 : " + timestamp);
+	        
+	        empVo.setHiredate(timestamp);
+	    	} catch (DateTimeParseException e) {
+	        	return "redirect:/emp/list";
+	  	}
+      		
+		service.register(empVo);
+		return "redirect:/emp/list";
+	}```
+
+-> 잘됨. ^^...
+
+- @Controller test 연습 좀 했으면 좋겠다....
+
+- 이후 SimpleDateFormat으로 해봄. LocalDate는 잘 안써봐서... 
+
+-> 잘됨.
+- 하지만, SimpleDateFormat은 넘어오는 값이 어떤 문자열 형태로 넘어오는지 알아야 한다는 전제가 깔리게 된다.
+-> 추가로 확인해야 하는 작업을 하고 싶지 않다면 그냥 LocalDate 쓰는 게 나을 듯...
+
+```java
+	    try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Date date = sdf.parse(hiredate);
+			Timestamp timestamp = new Timestamp(date.getTime());
+			empVo.setHiredate(timestamp);
+	    } catch (ParseException e) {
+	        return "redirect:/emp/list";
+	    }
+```
+
+---
+
+날짜 타입을 넣어줄 때 기본적인 규칙
+- 문자열로 넘길 때, "2024-04-06" 혹은 "2024/04/06" 형태여야 한다.
+- 문자열 외 다른 데이터타입(Timestamp 등)으로 맞춘 경우에는 해당 타입으로 맞춰야 한다.
+	- httpServletRequest에서 일일히 직접 받아 해결하기
+	- @RequestParam() 
+	- bean과 @RequestParam() 동시 활용
+
+---
+
+날짜 넣기 테스트할 땐
+new Timestamp(System.currentTimeMillis())
+- 현재 시간을 Timestamp()로 표현
+
+---
+
+Spring 커맨드 객체와, html의 <select> <option> 과 <checkbox> 타입은 잘 맞지 않는다고 한다.
+-> 경험상 맞지 않는다고.
+-> httpServletRequest로 바로 받아서 처리해버린다고...
+-> 이걸 기억해둬야 한다고.
+
+---
+
+- 실무에선 System.out.println()을 쓰지 못하게 함.
+-> out을 하게 되면, out 자체가 모니터랑 연결이 되어 있음.
+-> println이 모니터에 써주는 것이다.
+-> System 자체가 조금 무겁다.
+-> 많이 적게 되면 성능상에 영향을 주게 된다.
+
+- 은행권에서는 정확하게 시,분,초가 적혀야 한다.
+- System.out.println()의 경우에는 시간이 적혀있지 않다. 
+- 테스트 문구는 반드시 시간이 적혀있어야 한다.
+
+-> 각각의 프레임워크마다 Log를 지원하는 라이브러리가 있다.
+- Spring 용으로 사용되는 것 : Log4g 
+	- 2~3년 전에 한번 뚫렸었다고 한다. 
+	- 뚫리는 버전이 있다고 함.
+
+---
+
+pom.xml에 log 파일이 있는지 확인
+- dependency hierachy 부분 확인
+- 안 보일 경우, Open With - Maven POM Editor 로 보는 화면을 변경하여 해당 부분을 확인
+- 데이터베이스 관련 로그 남기는 라이브러리 추가
+```
+		<!-- log4j 라이브러리 -->
+		<dependency>
+			<groupId>org.bgee.log4jdbc-log4j2</groupId>
+			<artifactId>log4jdbc-log4j2-jdbc4</artifactId>
+			<version>1.16</version>
+		</dependency>
+```
+
+--- 
+
+application.properties 내용을 해당 방식처럼 바꾼다.
+
+```
+server.port=8282
+
+####  jsp
+spring.mvc.view.prefix=/WEB-INF/views/
+spring.mvc.view.suffix=.jsp
+
+#datasource (oracle)
+#spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+#spring.datasource.url=jdbc:oracle:thin:@localhost:1521/xe
+spring.datasource.driver-class-name=net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+spring.datasource.url=jdbc:log4jdbc:oracle:thin:@localhost:1521/xe
+spring.datasource.username=scott
+spring.datasource.password=tiger
+```
+
+해킹처럼, 라이브러리가 직접 데이터베이스를 침투하여 끌고 오는 것
+
+---
+
+log4jdbc.log4j2.properties 파일과 logback-spring.xml 을 src/main/resources 밑에 두기
+
+---
+
+테스트 클래스 위에 @Slf4j 사용하면 됨
+
+---
+
+회원 가입을 받게 되면, 로그인한 유저에 한하여 db에 담으면 된다.
+- jsp/servlet에서는 session 로그인을 진행했음.
+- spring에서는 기본적으로 user login을 spring security로 구현하고 있음.
+- jsp/servlet을 통한 session 로그인을 구현하면 바로 뚫리기 때문이다.
+
+spring mybatis 이후 spring security를 배우게 될 것.
+3차 프로젝트에서는 소셜 로그인을 구현해줘야 함.
+
+---
+
+
+
