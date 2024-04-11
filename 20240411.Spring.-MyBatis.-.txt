@@ -1,0 +1,251 @@
+20240411 Spring-연습-MyBatis설치-사용법
+
+---
+
+가위바위보에서 가장 치명적으로 저지른 실수는 
+1. 기존 코드를 변형하지 않고 진행하면 되는 부분을 굳이 변형한 점.
+-> 변형을 했다면, 구상을 다시 해야 한다는 점.
+2. 변형이 필요한 부분만 변형해서 가져오면 된다는 점
+-> request.setAttribute()가 코드에 있다면 spring에서는 model을 받아 해당 부분에 넣어주면 된다.
+
+
+- lombok을 쓰지 않아도 되는 경우에는 굳이 쓰지 말자
+-> setter and getter가 미리 설정되어 있는 파일을 그대로 가져다 쓰는 경우라면... 그냥 쓰면 되는 것.
+
+---
+
+service에 model를 매개변수로 받아 활용해도 된다.
+
+@Repository : jsp/servlet으로 비유하면 DAO
+@Service : jsp/servlet으로 비유하면 Command
+
+@Repository가 필요없는(데이터베이스에 연결되지 않는) 작업이라면 Service부터 시작하면 된다.
+- 이 부분을 제대로 생각 못해서 바보짓을 했다.
+
+---
+
+view 페이지에서 <input type="date">에 담긴 값을 가져오려고 했지만 empVo의 hiredate의 데이터 타입이 Timestamp라 들어가지 못하는 상황이 발생.
+즉, controller에 넘어오지 못하는 상황인 것.
+
+당시 찾았던 해결 방법 
+	- 1. empVo의 데이터 타입을 바꾼다.
+	- 2. 사용자로부터 전송된 문자열 데이터를 컨트롤러에서 받은 후, 해당 문자열을 Timestamp로 변환하는 작업을 수행
+	
+새로 찾은 해결 방법
+	- 3. empVo에, html에서 넘기는 데이터를 받는 새로운 변수를 만든다.
+	-> lombok을 사용하고 있기 때문에 생성자 에러가 발생할 수 있음.(@AllArgsConstructor)	
+	-> 기존 형태의 생성자를 추가로 생성해주도록 한다.
+
+	-> 데이터베이스에 넣는 과정에서도 날짜 부분만 수정하여 진행
+	(테스트 환경도 다시 수정하여 진행해야 한다. 이런 피곤한... )
+	
+	- 해당 방식의 최대 장점 : Timestamp 변환 과정이 필요없음.
+	
+---
+
+MyBatis
+- 대다수의 사람들이 사용한다는 마이바티스를 쓰게 된다.
+- https://mybatis.org/mybatis-3/ko/index.html
+- 데이터베이스와 Java 객체 간의 매핑을 쉽게 처리할 수 있도록 도와주는 도구
+
+- 설명 : 마이바티스는 개발자가 지정한 SQL, 저장프로시저 그리고 몇가지 고급 매핑을 지원하는 퍼시스턴스 프레임워크
+
+- 사용하기 쉽지만, 해당 프레임워크를 만든 개발자의 문법에 맞춰 코드를 작성해야 한다.
+
+---
+
+Mybatis를 적용시키기 위해서는 pom.xml에서 라이브러리를 추가해야 한다.
+```xml
+		<!-- 커넥션 풀 라이브러리 -->
+		<!-- 해당 부분은 주석처리를 해도 되고, 안해도 된다. 기본적으로 중복되는 부분을 마이바티스가 관리하기 때문. 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jdbc</artifactId>
+		</dependency>
+ 		-->
+ 		
+ 		<!-- 마이바티스-->
+		<dependency>
+		   <groupId>org.mybatis.spring.boot</groupId>
+		   <artifactId>mybatis-spring-boot-starter</artifactId>
+		   <version>2.1.4</version>
+		</dependency>
+```
+다운로드 진행이 오래 걸릴 수 있음.
+
+application.properties에서는 다음 설정을 추가한다.
+```
+#### mybatis
+mybatis.mapper-locations=mappers/**/*.xml
+```
+
+Mybatis를 사용하기 위한 필수 과정.
+
+---
+
+이후 mapper 파일 및 mapperScan 파일을 만든다. 
+- mapperScan은 넣는 개발자도 있고, 안하는 개발자도 있음.
+
+
+@SpringBootApplication이 붙은 클래스 위에 다음과 같은 에너테이션 붙이기.
+```java
+@MapperScan(value = {"edu.sejong.ex.mapper"})
+```
+
+@Mapper 구현하기.
+```java
+package edu.sejong.ex.mapper;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+@Mapper
+public interface TimeMapper {
+	
+	@Select("select sysdate from dual")
+	public String getTime();
+	
+	@Select("select 1+1 from dual")
+	public String getOnePlusOne();
+}
+
+```
+
+- @Repository에 직접 Connection, PreparedStatement, ResultSet(은 경우에 따라)을 구현해야 하는 과정을 생략할 수 있게 한 느낌...
+
+- 해당 인터페이스는 @Mapper 에너테이션이 붙어서 스프링이 해당 파일을 보고 구현체를 구현해주는 거 같다.
+
+---
+
+현업에선 sql문 중 select를 많이 활용한다.
+
+```
+	@Select("select 1+1 from dual")
+	public String getOnePlusOne();
+```
+
+해당 방식은 간단한 쿼리문에서나 사용할 뿐, 잘 사용하지 못한다. 
+
+---
+
+src/main/resources에 mappers 폴더를 만들고, 해당 폴더에 TimeMapper.xml 파일을 만든다
+해당 xml은 mybatis형 xml이다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sejong.ex.mapper.TimeMapper">
+    <select id="getTime2" resultType="string">
+    	<![CDATA[
+        	select sysdate from dual
+        ]]>
+    </select>
+</mapper>
+```
+
+MyBatis의 특징
+- 인터페이스에 있는 함수와 sql 구문이 매칭이 된다.
+- 현업에서는 에너테이션이 아니라, xml로 매칭을 시킨다고 한다.
+	- 위 xml에서, mapper 태그의 namespace는 mapper 인터페이스의 경로를 의미한다.
+		- 패키지 + 인터페이스명을 적어주기.
+	- 태그 id는 함수명, resultType은 2가지 타입 중 하나를 넣는다. string
+	- sql 구문에서는 ;를 넣지 않도록 한다. 에러도 안떠서 반나절 이상 소모할 수도 있다.
+	- <![CDATA[ (sql구문) ]]> 은, xml문법이 아니라는 것을 알려주는 것이다. 
+	-> sql 구문에 <>가 오는 경우가 있기 때문에, sql구문에 들어가는 문구는 xml문법으로 처리하면 안된다.
+	-> 해당 구문을 xml문법과 분리하여 처리하도록 유도하기 위해 해당 구문을 써주는 것이다.
+
+---
+
+- 기본적으로는 문법을 어렵게 쓰지 않으려고 한다.
+	- 옛날 버전들이 있기 때문에, 해당 부분도 수업하게 된다고.
+
+---
+
+이전에는 IBatis이라는 이름을 썼었다.
+
+MyBatis 버전 - 1,2,3
+
+Spring MyBatis의 원리
+	- DAO, (Connection, PreparedStatement, ResultSet)을 한번에 가져다 쓰기 위해 사용하는 프레임워크 / 라이브러리
+	-> 내부적으로 돌리기 위해 캡슐화시켰다.
+	- 2.3.1이 MyBatis 3버전이다. 현업가서는 거의 이 버전을 쓴다.
+	-> 하 지 만.... 유지 보수 단계에서는 예전 버전(1,2)으로 만들어진 프로그램이 상당히 많다. 
+	- 3버전에서 업데이트가 많이 이루어진 상태라고 한다. 좀 더 사용하기 쉽게 업데이트하고 그랬다고.
+	- 회사에 들어갔을 때 해당 버전을 확인하고 작업을 진행해야 한다는 것.
+
+1버전 : IBatis 
+	- Connection, PreparedStatement, ResultSet을 자주 쓰다보니 이를 구현하는 라이브러리가 나오게 된다는 건
+	다들 예상한 분위기였다고.
+
+2버전부터 MyBatis라는 이름으로 개명.
+
+---
+
+2버전을 사용하시는 개발자들도 많다고.
+
+---
+
+@MapperScan 에너테이션이 없으면 모두 읽어들인다고 한다.
+	- MyBatis용 인터페이스의 위치를 알려주는 에너테이션
+```
+@MapperScan(value = {"edu.sejong.ex.mapper"})
+```
+
+@MapperScan을 사용하면, @Mapper는 생략해도 된다.
+-> 하지만 개발자들이 눈으로 구분하기 위해 적어둔다고.
+-> 해당 상황에서의 실질적인 기능은 없음. 만약 @MapperScan이 없다면 기능을 하게 될 것이다.
+
+---
+
+sql 구문을 넣는 방법은 2가지
+- 에너테이션을 활용하는 방법
+- .xml을 활용하는 방법
+-> 이 중, 에너테이션은 3버전부터 지원되는 방법이다. 
+-> sql구문은 상당히 길게 사용하는 경우가 많기 때문에 보통 .xml 파일을 이용한다고 한다.
+
+---
+
+MyBatis에서는, MyBatis 라이브러리를 사용함으로서 소스 코드를 90% 이상 줄일 수 있다고 표현하고 있음
+
+---
+
+```
+<mapper namespace="edu.sejong.ex.mapper.DeptMapper">
+    <select id="selectList" resultType="edu.sejong.ex.vo.DeptVo">
+    	<![CDATA[
+        	select * from dept
+        ]]>
+    </select>
+</mapper>
+```
+
+여러 개의 데이터를 가져올 땐, resultType에 list를 지정하는 게 따로 없기 때문에 리스트로 받는 객체 타입으로 담아야 한다.
+해당 예시 코드는 list<DeptVo>로 리턴받기 때문에, resultType이 edu.sejong.ex.vo.DeptVo으로 된다.
+
+---
+
+@Slf4j : "Simple Logging Facade for Java
+
+```
+로깅 파사드는 다양한 로깅 라이브러리(예: Logback, Log4j, 등)를 추상화하여 표준화된 인터페이스를 제공하는 라이브러리입니다. 이는 로깅 코드를 작성할 때 특정 로깅 라이브러리에 종속되지 않도록 하여 유연성을 제공합니다. 개발자는 로깅 파사드를 사용하여 로깅 코드를 작성하고, 필요에 따라 실제로 사용할 로깅 라이브러리를 선택할 수 있습니다. 이는 애플리케이션의 로깅 기능을 향상시키고, 로깅 코드의 변경을 최소화하여 유지보수성을 높입니다.
+```
+
+---
+
+@Repository보다는 @Mapper를 훨씬 많이 쓴다고 한다.
+
+---
+
+홈페이지 내용 발췌
+
+SqlSession 사용
+
+마이바티스에서는 SqlSession를 생성하기 위해 SqlSessionFactory를 사용한다. 
+세션을 한번 생성하면 매핑구문을 실행하거나 커밋 또는 롤백을 하기 위해 세션을 사용할수 있다. 
+마지막으로 더 이상 필요하지 않은 상태가 되면 세션을 닫는다. 
+마이바티스 스프링 연동모듈을 사용하면 SqlSessionFactory를 직접 사용할 필요가 없다. 
+왜냐하면, 스프링 트랜잭션 설정에 따라 자동으로 커밋 혹은 롤백을 수행하고 닫혀지는, 쓰레드에 안전한 SqlSession 개체가 스프링 빈에 주입될 수 있기 때문이다.
+
+---
+
