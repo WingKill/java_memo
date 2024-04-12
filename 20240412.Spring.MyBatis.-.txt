@@ -1,0 +1,146 @@
+20240412 Spring MyBatis연습-게시판만들기
+
+---
+
+MyBatis 핵심은 .xml 문법을 외우는 것
+
+---
+
+```xml
+    <insert id="insert" parameterType="edu.sejong.ex.vo.DeptVo" >
+    	<![CDATA[
+        	insert into dept(deptno, dname, loc) values(#{deptno},#{dname},#{loc})
+        ]]>
+    </insert>
+```
+
+해당 코드에서 #{} 안에는 객체 내 변수명이 들어간다.
+파라미터로 넘어간 것이 DeptVo 객체이기 때문이다. 
+
+DeptMapper 인터페이스에 선언되어 있는 추상메서드는 다음과 같다.
+
+```java
+	void insert(DeptVo deptVo);
+```
+
+함수의 형태 및 sql 대입이 xml로 이루어진다고 봐도 된다.
+
+#{deptno}는 #{deptVo.getDeptno}로 생각하면 된다. Getter 함수가 호출되는 변수명이 온다고 생각하도록 하자.
+- PrepareStatement 의 setString()이나 setInt()를 내부적으로 호출하는 것
+
+---
+
+myBatis가 xml을 java파일로 바꿔서 메모리로 올린다.
+
+---
+
+Mapper 파일에서, insert와 delete 관련 과정은 return이 없는 void로 하는 경우도 있지만 int로 하는 경우가 많다고.
+```
+package edu.sejong.ex.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import edu.sejong.ex.vo.EmpVo;
+
+@Mapper
+public interface EmpMapper {
+	List<EmpVo> selectList();
+	List<EmpVo> selectMgrList();
+	List<String> selectJobList(); 
+	int insert(EmpVo empVo);
+	int delete(EmpVo empVo);
+}
+```
+해당 java 파일을 처리하는 .xml파일 내 태그는 동일하다. 
+- MyBatis에서 pstmt.executeUpdate()를 실행한 결과를 리턴해줄 수 있기 때문.
+- 이를 리턴받고 싶다면 void가 아니라 int로 리턴 타입을 정해주면 됨.
+
+---
+
+pom.xml을 수정하고 나서, 만약 오른쪽 하단에서 다운로드를 진행하고 있다면 해당 부분이 다 진행되고 나서 해야 한다.
+
+---
+
+.gitignore
+- 프로젝트 생성 시 내부에 나오는 파일 중 하나
+- git에 올리지 말아야 하는 파일을 지정해주는 파일.
+.project 와 .classpath : 이클립스가 파일 환경을 저장해두는 파일.
+.class : 클래스 파일.
+- 타 컴퓨터에서나 팀원이 다운로드하는데 필요없는 파일을 다운받지 못하도록 지정.
+
+- 해당 파일은 충분히 수정할 수 있으므로, 필요하면 수정하면 됨.
+- 현재는 선생님이 주신 파일을 다운로드받아 덮어쓰기한 상태.
+
+---
+
+eclipse에서 git clone하기
+- import - Project from Git(with smart import) - Clone URI - 주소 입력
+
+---
+
+branch 생성
+
+---
+
+application.properties에 해당 설정을 추가하면, MyBatis 파라미터 지정 시 패키지명을 지정한 부분까지 생략이 가능해진다.
+
+
+```xml
+mybatis.type-aliases-package=edu.sejong.ex
+```
+
+설정 추가 전 
+```xml
+    <select id="selectList" resultType="edu.sejong.ex.vo.BoardVo">
+    	<![CDATA[
+        	SELECT * FROM MVC_BOARD ORDER BY bgroup desc, bstep asc
+        ]]>
+    </select>
+```
+
+설정 추가 후
+```xml
+    <select id="selectList" resultType="BoardVo">
+    	<![CDATA[
+        	SELECT * FROM MVC_BOARD ORDER BY bgroup desc, bstep asc
+        ]]>
+    </select>
+```
+
+---
+
+게시글 리스트를 가져올 때
+- '원본글'을 기준으로 최근것부터 가져오고(내림차순) 
+- 댓글은 세로 기준으로 이전것부터 가져온다(오름차순).
+
+```
+SELECT * FROM MVC_BOARD ORDER BY bgroup desc, bstep asc
+```
+
+---
+
+Spring 활용 시 에너테이션을 빼먹지 않도록 주의바람.
+
+---
+
+주입하는 방법
+- 필드 주입 : 주로 많이 쓴다고 함
+- 생성자 주입 : 쓰는 사람이 남아 있음
+	- 가장 좋은 건 생성자 주입
+- 함수(Setter) 주입 
+
+---
+
+실제 개인에게 맞든 안 맞든, 
+- 단위 테스트를 진행하여 개발을 진행하는 것이 
+- 맨 마지막에 테스트를 진행하는 것보다 개발 속도 및 유지보수 면에서 효과가 있다
+는 것이 수많은 논문으로 증명이 됐다.
+
+---
+
+Mapper : DB와 가까우므로 sql 구문에 해당하는 함수이름을 많이 지어줌.
+Service : 유저 친화적으로 함수 이름을 지어줌.
+
+---
