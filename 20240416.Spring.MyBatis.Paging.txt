@@ -1,0 +1,105 @@
+20240416 Spring MyBatis Paging
+
+---
+
+수업을 mysql이 아니라 오라클로 하는 이유
+- paging 때문
+
+---
+
+- 페이징의 핵심은 DB쿼리
+- 두번째로 중요한 부분은 view 처리
+
+---
+
+Mysql에서는 Limit를 지원하기 때문에 쿼리문 부분이 금방 끝난다고 한다.
+```
+SELECT * FROM 테이블명 LIMIT 10 OFFSET 20;
+```
+
+---
+
+오라클로 12g부터는 limit에 해당하는 OFFSET과 FETCH FIRST이 지원되기 때문에 쉽다고 한다.
+- 물론 성능이 좋지 않다고 한다..... 퍼포먼스가 안좋고 속도가 느리다나...
+11g 이하는 해당 문법이 제공되지 않기 때문에 어렵다고 한다.
+
+- 현업에 가면 아직까지 은행권에서는 8i를 쓴다고...(40년 전 즈음 버전이라고...)
+- 현업에서는 12g 이전 버전을 기준으로 코딩하게 될 수밖에 없다고....
+
+---
+
+게시판 페이징 처리를 하지 않는다면
+-> 모든 데이터를 끌어오게 된다.
+-> 현업에서는 데이터가 100만개 가량 있다... 
+-> 게시판은 결국 int보다는 long으로 처리하게 된다고 한다.(int의 범위 때문)
+
+---
+
+Oracle이 시장 점유율의 1/3를 차지하고 있기에 해당 이론을 배워둬야 함.
+
+실무에서 mysql을 사용하지 않는 이유
+- 담당자와 연결이 되지 않는다............. 
+
+---
+
+rownum : 조회 후 순번을 매길 때 사용
+
+- 기존 테이블의 primary key로 설정되어 있는 번호를 활용할 수는 없는 이유
+	-> 게시판에서는 삭제 기능을 제공하기 때문.
+
+---
+
+아래 sql이 왜 나오지 않는가? 
+- 먼저 from이 실행(테이블 가져오기)
+- 이후로 where을 실행(조건을 따지기)
+- 그 다음에 select를 실행(고르기)
+
+-> sql 원리 때문에 해당 구문의 결과가 나오지 않는 것.
+
+```
+SELECT rownum rn, bid, bname, btitle FROM mvc_board where rownum > 1 and rownum <=20;
+```
+
+---
+
+rownum만 알고 있다면...
+
+```
+select * from (
+    SELECT
+        rownum rnum , A.*
+    FROM (select bid, bname, btitle from mvc_board order by bgroup desc, bstep asc) A where rownum <= 20)
+where rnum > 10;
+```
+서브 쿼리 2개를 써서 3중 쿼리를 사용할 수 있다.
+
+---
+
+이제 쿼리를 했다면 service, view를 처리해야 한다.
+
+---
+
+```
+	@GetMapping("/list2")
+	public String BoardList2(Criteria criteria, Model model) {
+		log.info("BoardList2()..");
+		model.addAttribute("boards", boardService.showListWithPaging(criteria));
+		
+		int total = boardService.getTotal();
+		model.addAttribute("pageMaker", new PageVo(total, criteria));
+		
+		return "/board/boardlist2";
+	}
+```
+
+해당 코드에서, Criteria criteria는 form 태그를 통해 전달되는 객체가 아니다.
+-> default 생성자를 통해 생성되는 커맨드 객체이다.
+
+---
+
+- Criteria형 커맨드 객체 내 변수에 값을 대입하기 위해 Get방식으로 넘김.
+-> 페이지 번호 링크를 클릭할 때마다, Get방식으로 값을 담은 변수를 전달.
+-> 커맨드 객체의 setter함수를 통해 커맨드 객체로 값을 대입시킬 수 있도록 한 것.
+
+---
+
