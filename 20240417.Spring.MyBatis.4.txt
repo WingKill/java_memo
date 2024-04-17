@@ -1,0 +1,150 @@
+20240417 Spring MyBatis 구현방법 4가지
+
+---
+
+옛날에 파일 이름 짓던 방식
+- IBDao : Interface Board Dao 
+- 이후 3버전 배포되고 Mapper를 사용하기 시작하면서, 이름에 Mapper가 붙게 된 것.
+
+---
+
+- 마이바티스 1번째 사용 방법
+	- interface IBBao를 XML namespace에 매핑<mapper namespace="패키지명.IBDao">
+	- sqlSession.getMapper(IBDao.class)를 이용 
+
+---
+
+- MyBatis 2버전에서 자주 사용하는 객체
+	- SqlSession
+	- SqlSessionTemplate : 사실상 이 객체가 MyBatis라고 표현한다.
+		- SqlSession 인터페이스의 구현체
+	- Thread-Safe가 되냐 안되냐로 구분할 수 있다고 언급함
+		- 동시에 여러 쓰레드에서 객체를 안전하게 사용할 수 있는 상태
+```
+챗 gpt 답변
+
+- SqlSessionTemplate은 스프링의 빈으로 관리되며 스프링 컨테이너가 관리하는 빈으로 등록되어 있습니다. 
+- 스프링에서 빈으로 등록된 객체는 기본적으로 싱글톤(Singleton)으로 관리되며, 스프링 빈의 동작은 쓰레드 세이프합니다. 
+- 따라서 SqlSessionTemplate은 일반적으로 쓰레드 세이프하게 동작합니다.
+
+- 반면에 SqlSession은 MyBatis의 세션 객체로, 일반적으로 MyBatis의 SqlSessionFactory를 통해 생성됩니다. 
+- MyBatis의 SqlSession은 여러 스레드에서 동시에 사용될 수 있지만, 각 쓰레드에서는 동기화를 통해 안전하게 사용해야 합니다. 
+- 따라서 SqlSession은 쓰레드 세이프하지 않을 수 있습니다. 개발자가 명시적으로 동기화 처리를 해주어야 합니다.
+```
+
+---
+
+MyBatis는 모든 언어에서 사용할 수 있음.
+
+MyBatis 세팅 과정은, Spring Legacy에서는  SqlSessionTemplate 객체를 생성하는 과정을 말하는 것.
+Spring Boot에서는 해당 객체를 자동적으로 생성해준다.
+
+---
+
+- 마이바티스 2번째 사용 방법
+	- interface는 필요가 없음
+	- sqlSession에서 제공하는 함수(selectList, selectOne)를 이용함
+	- 쿼리 구현을 위한  XML이 필요. 해당 XML의 namespace는 개발자가 정함
+
+```
+sqlSession.selectList("board.selectBoardList")
+```
+- 해당 방식은, 기존처럼 mapper interface를 따로 만들지 않고 mapper의 namespace와 해당 함수명을 대입하는 것.
+- mapper에서는 namespace와 select태그의 id를 각각 board, selectBoardList로 세팅하고 sql구문을 넣어주면 된다.
+- 해당 방식의 장점
+	- .xml로 작성했을 때 List로 리턴되는지, 하나만 리턴되는지를 잘 알 수가 없음
+	-> 해당 방식은 sqlSession에서 제공하는 함수를 사용하므로 어떤 값이 리턴되는지를 파악할 수 있음
+	- 개발자가 원하는 이름으로 namespace와 함수명을 정할 수 있음.
+- 개발자들이 선호하는 방식 중 하나라서 상당히 자주 볼 수 있다고.
+
+---
+
+- 마이바티스 3번째 사용 방법
+	- MyBatis 3버전부터 사용할 수 있는 방법
+	- annotation을 활용하는 방법.
+		- .xml을 구현할 필요가 없다는 장점은 있음.
+	- 개발자들이 자주 쓰지는 않는 방법.
+
+```
+	@Select("SELECT * FROM MVC_BOARD ORDER BY bgroup desc, bstep asc")
+	List<BoardVo> selectList2();
+```
+	
+---
+
+- 마이바티스 4번째 사용방법
+	- 기존에 활용하던, xml 활용 방식과 3번째 사용 방법을 필요할 때마다 골라서 사용하는 방식.
+
+---
+
+1:N 처리
+
+- 현업에서는 다대다 관계를 절대 사용하지 않는다.
+-> 무조건 일대다 관계로 만들어서 사용한다.
+
+- 관계형 데이터베이스는 정규화된 테이블의 집합이기 때문에 2개의 테이블로 다대다 관계를 표현할 수 없다고 함.
+
+참조링크 : https://velog.io/@gagaeun/%EA%B4%80%EA%B3%84%ED%98%95-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4%EC%9D%98-11-1N-NM-%EA%B4%80%EA%B3%84
+
+---
+
+SQL join 처리는 다들 할 줄 알지만, 자바에서 Dto를 활용하는 방식은 아직 모른다.
+
+---
+
+Spring MyBatis에서 join 쿼리문 처리하는 방법
+- join 테이블을 담는 vo 생성 및 활용
+- resultmap을 활용
+
+---
+
+- sql 템플릿을 mybatis라고 표현한다.
+
+---
+
+구역을 짤 때, 1:n으로 맞춘다.
+
+1인 테이블 데이터는 그대로 받고, n인 테이블 데이터는 List로 받는 ... 그런 것
+
+```
+package edu.sejong.ex.vo;
+
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class DeptEmpVo {	
+	private int dDeptno;
+	private String dname;
+	private String loc;
+	
+	private List<EmpVo> empList;
+}
+```
+
+---
+
+resultMap
+- DB의 컬럼과 java 클래스의 변수를 맵핑한다는 것
+- 내부에 들어가는 태그 중 <collection></collection>은 자바의 컬렉션 프레임워크를 말한다.
+- 1:다 관계라면 collection, 1:1 관계라면 association이 사용됨. 
+-> 이는 mybatis 문법이다.
+- id : primary key를 표시하는 역할이 추가된, result 태그와 동일한 동작을 하는 태그
+
+---
+
+Spring -> json 쏴주는 방법을 배워야 한다.
+이를 restful이라 한다. 
+이는 현업에서 자주 활용하는 방식이라고 한다.
+
+---
+
