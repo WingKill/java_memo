@@ -1,0 +1,94 @@
+20240418Spring-MyBatis-join&정적리소스처리
+
+---
+
+join을 처리하는 방법은 여러 가지가 있다. Map이나 command 객체 활용 등...
+그러나 내부적으로는 resultMap이 1:n 문제를 해결해주기 때문에 이 방법을 권장한다.
+
+---
+
+collection : collection framework 활용하여 리스트를 뽑아내기
+association : 객체 하나 가져오기
+
+---
+
+Spring 정적 리소스 파일 두는 공간
+```
+src/main/resources
+	static
+
+```
+src/main/resources 의 static 폴더 내에 정적 리소스 파일들을 넣어 관리하면 된다.
+
+---
+
+여기에서는 자바스크립트도 정적 리소스 파일이라고 할 수 있다.
+
+---
+
+spring 자체적으로 서버의 welcome 파일이 index.html로 지정되어 있음.
+-> 바로 접속 시 해당 index.html을 보여준다는 걸로 확인이 가능.
+
+---
+
+다음주 중으로 Spring Security 들어감
+
+---
+
+Spring Security 
+- 로그인 구현
+
+---
+
+DB 설계가 중요
+
+---
+
+Spring Security에서 활용하기 위해, 데이터베이스 내 데이터를 집어넣을 때
+일부 데이터는 대문자로 넣는다고. 무엇 때문일까...
+```
+INSERT into authorities(username,authority) values ('admin','ROLE_ADMIN');
+INSERT into authorities(username,authority) values ('admin','ROLE_MANAGER');
+INSERT into authorities(username,authority) values ('admin','ROLE_USER');
+INSERT into authorities(username,authority) values ('member','ROLE_MANAGER');
+INSERT into authorities(username,authority) values ('user','ROLE_USER');
+```
+
+- authority를 설정할 때 대문자 및 ROLE_ 을 앞에 붙여주고 있다.
+-> spring security를 활용할 때 이를 이용한다고 하는 거 같다.
+
+---
+
+.xml 작성하면서 느낀 점
+
+```
+	<resultMap id="authMap" type="AuthVo">
+		<result column="username" property="userName" />
+		<result column="authority" property="authority" />
+	</resultMap>
+```
+
+해당 태그에서, 괜히 착각하여 foreign key 부분을 result 태그가 아닌, id 태그로 달아버리면 안된다.
+id 태그는 primary key를 처리할 때 활용하는 것이며, foreign key에 붙여버리면 데이터가 1개씩만 온다.
+
+아마도 해당 태그를 붙이면 내부적으로 primary key의 특성을 고려하여 처리하는 모양... 
+해당 컬럼에 중복되는 값이 있으면 데이터들이 unread 처리되버리고, 프로그램 오류는 안난다.
+데이터 확인에서 문제점이 발견되는 것...
+
+---
+
+```
+<insert id="insertAuthorities" parameterType="UserVo">
+    <foreach collection="authorities" item="auth" separator=";">
+        <![CDATA[
+            INSERT INTO authorities(username, authority) VALUES (#{userName}, #{auth.authority})
+        ]]>
+    </foreach>
+</insert>
+
+```
+
+이 부분을 사용하게 되었는데, 이를 다음 시간에 배우게 될 것이다.
+
+
+
