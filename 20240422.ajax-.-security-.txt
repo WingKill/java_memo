@@ -1,0 +1,191 @@
+20240422 ajax-이후-security-시작
+
+하루를 빠진 만큼, 채워야 한다.
+---
+
+@RestController 
+- java 객체를 리턴해서 json으로 던져준다.
+
+---
+
+모듈화
+- 여러 곳에서 그대로 복사하게 만드는 것보다, 한 곳에 모듈화하고 그것을 호출하는 방식이 코드를 줄일 수 있다.
+- 모듈화를 활용하려면 기존 함수 수정 및 활용할 페이지에 모듈화시킨 파일을 포함시켜야 한다.
+
+---
+
+/*
+//REST : Representational State Transfer
+//하나의 URI가 하나의 고유한 리소스를 대표하도록 설계된 개념
+*/
+
+//http://localhost/spring02/list?bno=1 ==> url+파라미터
+//http://localhost/spring02/list/1 ==> url
+//RestController은 스프링 4.0부터 지원
+//@Controller, @RestController 차이점은 메서드가 종료되면 화면전환의 유무
+//@RestController 기존의 @Controller 와는 완전다른 기능임
+
+---
+
+모듈 패턴은 쉽게 말해서 Java의 클래스처럼 JavaScript를 이용해서 메서드를 가지는 객체를 구성한다. 
+모듈 패턴은 JavaScript의 즉시 실행함수와 '{}'를 이용해서 객체를 구성한다. 
+
+---
+
+자바스크립트에서는 jsp 문법인 ${pageContext.request.contextPath} 이 먹히지 않는다.
+url 설정할 때 조심할 것.
+
+---
+
+보안 처리와 암호학은 다른 것.......
+
+---
+
+스프링 시큐리티 
+- 사용하지 않으면 해커한테 바로 뚫리게 되어 있음
+-> 스프링을 사용한다면, 반드시 사용해야 한다는 것.
+
+---
+
+spring legacy에서는 일일히 해야 했지만, spring boot에서는 감춰버렸기 때문에 쉽게 접근할 수 있음.
+
+---
+
+세팅이나 써 먹는 방법이 버전에 따라 달라질 수 있다. 
+
+---
+
+Spring Security는 기본적으로 프레임워크다.
+- MyBatis처럼, 좋은 것을 가져와 사용하는 것이다.
+-> pom.xml에서 library를 끌고 오는 작업이 필요함.
+
+```
+		<!-- 스프링 시큐리티 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- 스프링 부트에서는 jsp 태그를 지원 하지 않기 때문에 직접 입력 해야 함 -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+		</dependency>
+```
+
+---
+
+Spring Security를 다운로드받으면, 기존에 작성했던 파일들에 접근하기 위해서는 로그인을 진행해야 한다.
+- 로그인 기본 id : user
+- 패스워드는 콘솔창에서 확인할 수 있음
+
+```
+Using generated security password: ac4228b9-5deb-4f42-b184-a8341c95babf
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+```
+
+---
+
+Security : 보안
+- 인증과 리소스 권한 관리를 컨트롤하는 게 Spring Security의 역할
+- 인증 + 리소스 권한 관리 = 보안
+
+- 인증(Authentication) : 유저가 누구인지 확인하는 절차
+- 인가/ 권한 부여(Authorization) : 사용자가 로그인하면, 해당 사용자가 맞는지 확인하는 절차
+
+---
+
+인증 방식에는 3가지가 있다.
+- 세션 - 쿠키
+- 토큰 인증 방식
+- 소셜 로그인 방식 
+
+- 보통 3가지를 섞어서 구현한다고 한다.
+
+---
+
+스프링 시큐리티 특징과 구조
+- 기본적으로 세션과 쿠키 인증 방식 
+
+---
+
+Security library를 가져다 쓴다는 것
+- 원래대로라면, HttpServletRequest와 HttpServletResponse가 controller로 바로 전달되어야 하지만
+Security를 설치하면 해당 라이브러리가 두 객체를 가로채서 인증 및 권한 체크를 진행하는 것.
+
+---
+
+@Configuration
+- 설정 파일(의미 : @Component + 설정) 
+
+---
+이후 내용은 스프링 시큐리티 설정 설명 파일의 내용을 가져온 것이다.
+---
+
+## step 1
+
+- dependency만 추가해도, Spring Security에서 제공하는 가장 기본적인 인증이 바로 적용된다.
+	- 기본 로그인 화면으로 이동
+	-> Username : user (기본계정 )
+	-> Password : 어플리케이션 기동 시 로그로 나오는 Using generated security password 정보 확인
+```
+Using generated security password: ac4228b9-5deb-4f42-b184-a8341c95babf
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+```
+
+---
+
+## step 2
+- 이미지(가영이)가 보이지 않는다.
+	- 우선 정적파일들은 시큐리티에 적용되지 않도록 아래와 같이 설정을 한다.
+	-> 이제 더이상 리소스파일들은 스프링 시큐리티에서 관리를 하지 않는다.   
+```
+   @Override
+   public void configure(WebSecurity web) throws Exception {
+      // web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+      web.ignoring().antMatchers("/css/**", "/js/**", "/images/**", "/lib/**");
+   }
+```
+
+---
+
+## step 3
+
+- 이제 설정에서 테스트 유저를 생성한 후, 다시 한번 접속하기. 
+-> 로그인 창에서 아래의 이름과 비밀번호로 접속해 보기.
+```
+   @Override
+   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+       auth.inMemoryAuthentication()
+               .withUser("member").password("{noop}member").roles("USER").and()
+               .withUser("admin").password("{noop}admin").roles("ADMIN");
+   }
+```
+
+---
+
+## step 4
+
+- home.jsp를 제대로 만들기 
+- 아래와 같이 설정하여 / 로 접속 후 home.jsp 가 나오는것을 확인한다.
+```
+   @Override
+   protected void configure(HttpSecurity http) throws Exception {
+      //우선 CSRF설정을 해제한다.
+      //초기 개발시만 해주는게 좋다.
+      http.csrf().disable();
+      // 	
+      http.authorizeRequests()
+      .antMatchers("/member/**").hasAnyRole("ROLE_MEMBER") 
+      .antMatchers("/admin/**").hasAnyRole("ROLE_ADMIN")
+      .antMatchers("/**").permitAll();           
+   }
+```
+
+
