@@ -1,0 +1,272 @@
+20240426 Spring 테스트
+
+---
+
+대형 사이트에 검색 노출이 될 수 있도록 하는 태그 : meta 태그
+
+---
+
+
+
+/*
+//REST : Representational State Transfer
+//하나의 URI가 하나의 고유한 리소스를 대표하도록 설계된 개념
+*/
+
+//http://localhost/spring02/list?bno=1 ==> url+파라미터
+//http://localhost/spring02/list/1 ==> url
+//RestController은 스프링 4.0부터 지원
+//@Controller, @RestController 차이점은 메서드가 종료되면 화면전환의 유무
+//@RestController 기존의 @Controller 와는 완전다른 기능임
+
+---
+
+소프트웨어 품질은 누가 판단하는가?
+	- 전문 테스터(QA) : 소프트웨어 품질을 좌우
+
+---
+
+테스트는 소프트웨어 개발 과정에서 하나의 프로세스라고 보면 됨.
+
+---
+
+국내에서는 사람 탓, 해외에서는 프로세스 탓을 한다고.
+
+---
+
+폭포수 방법론
+
+- 요구사항 분석
+- 설계
+- 구현
+- 테스트
+- 유지보수
+
+---
+
+개발 시 해당 작업을 문서화하는 시간을 둬야 한다.
+
+---
+
+자바 자료형의 크기 문제로 인한 문제점은 생각보다 자주 발생한다고 한다.
+
+---
+
+단위 테스트
+	- 주로 메서드 수준으로 단위를 정하여 테스트
+
+통합 테스트
+	- 여러 모듈을 모아, 의도대로 협력되는지 여부를 확인하는 테스트
+	- 현재 배우는 상황에서는 클래스 기준으로 테스트하는 것을 통합 테스트로 표현
+
+인수 테스트
+	- 사용자 스토리(시나리오)에 맞춰 수행하는 테스트
+	-> 다른 의사소통집단으로부터 시나리오를 받아 개발한다는 의미
+	- 요구사항대로 잘 작동되는가를 따지는 것
+
+---
+
+농협 프로젝트는 생각보다 빡세다고.
+	- 기존에 농협에서 유출됐던 사건이 있었고, 이후로 보안 강화가 이루어짐
+
+---
+
+테스트에 어떤 것을 만들어둬야 하는지를 배우는 것
+
+---
+
+요구사항 분석서 작성 요령
+
+일정에서도 확인 가능
+
+---
+
+드디어.. 프로젝트 시작 전 샘플 문서들을 볼 수 있게 된다.
+
+- 현업에서는 포트폴리오볼 때 프로젝트 결과물은 그렇게 따지지 않지만, DB 모델링이나 테스트 문서 등으로 판단한다고.
+
+---
+
+회사에서 보고 연락이 오는 문서들은 주로
+- DB 모델링
+- 테스트 문서
+- 요구사항 분석서
+등이 있다.
+
+---
+
+java는 테스트용으로 JUNIT을 쓴다.
+
+에릭 감마
+	- eclipse 개발자
+	- junit 개발자
+	- design pattern
+
+junit 
+	- 테스트를 위해 사용하는 라이브러리
+
+---
+
+프로젝트할 때 VO, Service, controller 마다 필요한 부분에 테스트를 진행한 흔적(테스트 문서)이 있어야 한다.
+
+---
+
+1. assert로 시작하는 함수들 활용했는가?
+2. connection pool을 호출하여 활용할 수 있는가?
+
+---
+
+@SpringBootTest :  .java를 .class로 생성하는 작업을 흉내냄
+
+---
+
+SpringBoot에서는 데이터소스를 Hikari 사에서 만든 것을 쓴다고 함.
+- 성능이 좋아서 default로 넣었다고.
+
+---
+
+테스트는 주로 게시판 위주로 많이 해 놓는 게 좋음.
+- CRUD 4개 및 페이징은 꼭 좀 남겨달라는 당부가 있었음.
+
+---
+
+- 외국과 한국의 차이점은, 그저 퇴근 시간을 준수하는 것 뿐이라고 함. 
+
+---
+
+Controller Test는 기존 @Service나 @Mapper 파일 테스트를 진행했을 때와는 다르게 진행됨.
+- 실무에서는 Controller Test를 하는 것보다 웹브라우저에서 결과를 확인하는 게 더 빠르기 때문에 잘 하지 않는다고.
+- 물론 jsp 파일이 없는 과정에서, url 테스트를 진행해야 하는 상황이라거나... 하면 하게 될 것.
+
+- 하지만 문서는 남겨놔야 한다고.
+
+- Mock 테스트를 진행한다고.
+	- 단어 뜻 : 모방, 모의
+
+
+---
+
+1. @ExtendWith(MockitoExtension.class) 활용 : Controller만 테스트하기 위함
+
+```
+@ExtendWith(MockitoExtension.class)
+```
+해당 에네테이션을 해야 MockitoExtension 객체(Mock 객체)를 가져올 수 있음.
+
+```
+	@Autowired
+	private MockMvc mockMvc; // HTTP 호출을 위한  MockMVC 사용
+```
+MockMvc : 웹 브라우저 역할을 함.
+
+```
+	@BeforeEach// JUNIT4에서는 @Before였다고.
+	void setUp() {
+		mockMvc = MockMvcBuilders.standaloneSetup(new HomeController()).build();
+	}
+```
+@BeforeEach : 실행되기 전 먼저 처리해야 하는 것들을 처리.
+
+---
+
+2. @SpringBootTest ,@AutoConfigureMockMvc 활용
+
+```
+@Slf4j
+@SpringBootTest
+@AutoConfigureMockMvc
+```
+
+@AutoConfigureMockMvc : IOC컨테이너에 MockMvc 를 집어넣고, 이를 꺼내쓸 수 있도록 한다.
+
+---
+
+다음을 테스트하기 위해, '/board' 의 접근 권한은 없애고 테스트했다.
+
+```
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		// 우선 CSRF설정을 해제한다.
+		// 초기 개발시만 해주는게 좋다.
+		// http.csrf().disable();
+
+		// 권한 설정
+		http.authorizeRequests()
+			.antMatchers("/user/**").hasAnyRole("USER")
+			.antMatchers("/admin/**").hasAnyRole("ADMIN")
+		 // .antMatchers("/board/**").hasAnyRole("ADMIN")
+  		 // .antMatchers("/company/list").hasAnyRole("ADMIN")
+			.antMatchers("/**").permitAll();
+
+		// 스프링 시큐리티가 기본적으로 가지고 있는 로그인 폼을 사용한다는 의미. 기본 설정이다.
+		// http.formLogin();
+		http.formLogin().loginPage("/login")
+				// .loginPage("/elogin")
+				.usernameParameter("id").passwordParameter("pw")
+				// .defaultSuccessUrl("/board/list2")
+				// .defaultSuccessUrl("/index")
+				.defaultSuccessUrl("/").permitAll(); // 모든 사람에게 허용하겠다는 의미.
+	}
+```
+
+이후 테스트를 실행했을 때 다음이 제대로 테스트가 진행되었다.
+
+
+```
+package edu.sejong.ex.controller;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@SpringBootTest
+@AutoConfigureMockMvc
+class BoardControllerTest {
+
+	@Autowired
+	private MockMvc mockMvc;
+	
+	@Disabled
+	@Test
+	void testHome() throws Exception{
+		mockMvc.perform(MockMvcRequestBuilders.get("/board/list"))
+			   .andExpect(MockMvcResultMatchers.status().isOk())
+			   .andDo(print());
+	}
+
+	@Test
+	void testBoard() throws Exception{		
+		mockMvc.perform(MockMvcRequestBuilders.get("/board/list2"))
+			   .andExpect(MockMvcResultMatchers.status().isOk())
+			   .andExpect(MockMvcResultMatchers.view().name("/board/boardlist2"))
+               .andExpect(MockMvcResultMatchers.model().attributeExists("boards"))
+               .andExpect(MockMvcResultMatchers.model().attributeExists("pageMaker"))
+               .andExpect(MockMvcResultMatchers.model().attribute("pageMaker", Matchers.hasProperty("criteria")))
+               .andExpect(MockMvcResultMatchers.model().attribute("pageMaker", Matchers.hasProperty("criteria", Matchers.hasProperty("pageNum", equalTo(1)))))
+               .andExpect(MockMvcResultMatchers.model().attribute("pageMaker", Matchers.hasProperty("criteria", Matchers.hasProperty("amount", equalTo(10)))))
+               .andDo(print());
+	}
+	
+	@Disabled
+	@Test
+	void testBoardJson() throws Exception{
+		mockMvc.perform(MockMvcRequestBuilders.get("/boards/list"))
+			   .andExpect(MockMvcResultMatchers.status().isOk())
+			   .andDo(print());
+	}
+}
+
+```
+
