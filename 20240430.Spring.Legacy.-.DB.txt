@@ -1,0 +1,192 @@
+20240430 Spring Legacy - DB 설계
+
+---
+
+root-context.xml
+- DB와 관련된 설정을 다루는 파일
+
+---
+
+- pom.xml
+- web.xml
+- root-context.xml
+- servlet-context.xml
+
+설정 파일 4가지를 걸쳐간다.
+
+---
+
+Spring Boot에서는 application.properties에
+```
+#### mybatis
+mybatis.mapper-locations=mappers/**/*.xml
+mybatis.type-aliases-package=edu.sejong.ex
+```
+를 추가하여, xml 위치와 인터페이스 패키지를 지정해줬었다.
+
+Spring Legacy에서는 xml 위치를 미지정하는 경우에는, 인터페이스 패키지명과 동일한 위치로 찾아들어간다.
+```
+	<mybatis-spring:scan base-package="edu.sejong.ex.mapper" />
+```
+해당 상황이라면, resource 밑에 'edu/sejong/ex/mapper'를 찾는다. 
+
+---
+
+Mapper.xml 루트를 지정해주고 싶다면, sqlSessionFactory 빈 객체에 지정해주면 된다.
+```
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="mapperLocations" value="classpath:/mappers/**/*.xml" />
+	</bean>
+```
+
+---
+
+Spring Legacy에서는 main이 없음. 
+- 내장 서버가 아닌 외장 서버를 활용하는 것.
+
+---
+
+Spring Legacy는 공식적인 지원을 끊은 상태
+- 하지만, Spring Boot만 하게 되면 Spring Legacy 부분을 이해하지 못하기 때문에 이론 수업을 진행하는 것이다.
+
+---
+
+Controller Test에 필요한 것 : MockMvc
+- Mock 테스트를 진행해야 하므로
+
+---
+
+Spring Legacy에서는 IOC container 를 다 읽는다.
+```
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration({"file:src/main/webapp/WEB-INF/spring/root-context.xml",
+					   "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"})
+
+public class DeptControllerTest {
+
+	@Autowired
+	private WebApplicationContext ctx;
+	
+	private MockMvc mockMvc;
+
+}
+
+```
+
+---
+
+- root
+- servlet
+
+```
+
+Spring Legacy에서는 먼저 root context가 생성됩니다. 
+root context는 ApplicationContext를 만들어서 애플리케이션의 비즈니스 로직과 관련된 빈들을 관리합니다. 
+그 다음에는 servlet context가 생성되어 DispatcherServlet이 웹 요청을 처리하고 뷰를 렌더링하는 데 필요한 설정을 포함합니다. 
+일반적으로 root context에는 데이터베이스 연결, 서비스 계층, 보안 설정 등과 같은 애플리케이션의 핵심 기능이 포함되고, servlet context에는 웹 관련된 설정들이 포함됩니다. 
+이렇게 root context가 먼저 생성되고, 그 다음에 servlet context가 생성됩니다.
+
+```
+
+---
+
+규모가 작은 회사에서는, 팀장이 DB 설계도 겸해서 할 수 있음
+- 물론 DB 관리를 위해, DBA 공고를 내기 시작
+-> DBA 공고를 내는 회사는 점점 성장하고 있는 회사라는 증거로 볼 수 있다고.
+
+---
+
+데이터와 DB의 차이
+- 데이터 : 낱개의 정보
+- DB : 관련된 데이터들을 저장하는 모임
+
+DataBase
+- 서로 관련있는 데이터들 집합
+
+---
+
+DBMS : 데이터베이스 매니지먼트 시스템 장점
+- 데이터 보안
+- 백업 및 복구 지원 등
+
+단점
+- 자원이 많고 복잡하며 비쌈
+
+---
+
+데이터베이스 스키마
+- 데이터베이스(Database) 구조와 제약조건에 대해 분명하고, 자세하게 기술한 것
+- 개발자마다 생각이 다르고 표현이 다름.
+
+
+- 제약조건 
+	- primary key(not null + unique)
+	- foreign key
+	- check
+ 
+- 카디널리티
+	- 1:1
+	- 1:N
+	- N:N
+
+---
+
+데이터베이스 언어(sql)
+	- DDL : 데이터 정의어(테이블 자체를 정의) - Data Definition Language
+	- DML : 데이터 조작어(CRUD) - Data Manipulation Language
+	- DCL : 데이터 제어어(rollback, commit) - Data Control Language
+
+---
+
+데이터베이스 관리자(DBA - Database Administrator) : 데이터베이스 전체 환경 구성 및 운영에 관련된 전반적 책임자
+
+데이터베이스 설계자(Database Designer) : 데이터베이스 요구사항 분석 후 데이터베이스 개념적, 물리적 스키마 설계 책임짐.
+
+---
+
+컬럼은, 논문에서는 에트리뷰트나 필드라고 표현을 많이 한다. 
+(DB 용어이며, 소프트웨어 상에서의 해당 표현은 논문에서 자주 쓰는 표현이라 같이 사용하는 것이라 보면 된다.)
+
+---
+
+DB 모델링
+- 데이터 분석 후, 제약 조건을 체계적으로 정의하고 개념적 도구(ERD)를 이용하여 간결하고 이해하기 쉽게 표현
+-> 최종 목적 : 각각의 DB에 데이터 타입 맞춰서 테이블 생성
+
+데이터 모델링 종류
+	- 개념적 데이터 모델 : ER Model
+		- 기본적으로, 범용적으로 쓸수밖에 없음
+		- 회사마다 반드시 남기게 되어 있음
+	- 논리적 데이터 모델 : 관계형 데이터 모델
+	- 물리적 데이터 모델 :
+
+- ER 모델의 구성 요소
+	- 엔티티(Entity) : 테이블로 구현
+	- 애트리뷰트(Attribute) : 컬럼
+	- 관계(Relationship) :  3가지 관계
+
+---
+
+- key attribute : 엔티티들을 식별할 수 있는 유일한 제약조건을 갖는 에트리뷰트
+- Multivalue attribute(다치 애트리뷰트) : 애트리뷰트 하나에 2개 이상의 값이 들어갈 수 있음.
+	- 다치는 멀티의 일본어 약자라고 한다.
+	- 멀티 애트리뷰트라고 말하자... 
+	-> 데이터베이스에는 절대 들어가서는 안된다. 
+	-> DB에 넣기 전 생각하는 요소
+- Derived Attribute(유도된 애트리뷰트) 
+	- 저장된 값으로부터 계산해서 얻은 값을 사용함.
+	- 실제 값이 저장되어 있는 게 아님.
+
+---
+
+부분키(partial key) : 종속 관계
+	- 네모 : 테이블
+	- 다이아몬드 : 관계
+
+---
+
+
+
+
