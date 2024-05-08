@@ -1,0 +1,154 @@
+20240508 리눅스 
+
+---
+
+서버에서는 유닉스를 많이 쓴다.
+- 
+
+---
+
+옛날에는 aws에서 ip를 할당받는 방식으로 시도했지만,
+이제는 가상머신이나 자체 서버를 활용하는 방식으로 진행한다고.
+
+서버용 프로그램 개발이나 지원, 활동
+
+---
+
+System 권한 : root 권한이라고도 표현
+
+---
+
+해커의 최종 목적 : root 권한 탈취
+
+---
+
+$ : 일반 유저를 의미
+# : root 권한을 의미
+
+---
+
+$sudo su - root
+
+-> 해당접속 아이디의 비밀번호 입력(비밀번호는 보이지 않음)
+
+-> root 권한으로 접속
+
+---
+
+설정 파일을 수정하여 처음부터 관리자 권한으로 접속할 수 있도록 할 예정
+- 이는 분명 지양해야 할 사항이지만, 학습을 위해 설정해 놓는 것
+
+---
+
+주석 처리는 앞에 #이 붙는다.
+주석 제거는 앞에 붙어있는 #을 제거하는 것이다.
+
+1. nano /etc/gdm3/custom.conf
+- 해당 구문의 주석 제거
+```
+# AutomaticLoginEnable = true
+# AutomaticLogin = user1
+```
+- 주석을 제거한 부분 중 AutomaticLogin = user1 를 AutomaticLogin = root로 교체
+- [security] 아래에 다음 구문 추가
+```
+AllowRoot = true
+```
+- 이후 수정한 파일을 저장.
+
+2. nano /etc/pam.d/gdm-password
+- 다음 구문을 주석 처리 
+```
+auth required pam_succeed_if.so user != root quiet_success
+```
+- 저장 후 나가기
+
+3. nano /etc/pam.d/gdm-autologin
+- 다음 구문을 주석 처리 
+```
+auth required pam_succeed_if.so user != root quiet_success
+```
+- 저장 후 나가기
+
+4. nano /root/.profile 
+- 다음 구문을 주석 처리 
+```
+mesg n || true
+```
+- 저장 후 나가기
+
+5. reboot 입력하여 리부트 실행
+
+-> 관리자 권한으로 실행되어 터미널은 처음부터 #으로 시작하고 있음을 확인할 수 있다.
+
+---
+
+Window : GUI
+Linux : CLI
+
+---
+
+명령어 모음
+- 명령어는 1000 가지 가량 된다고 보면 된다. 
+
+- poweroff : 리눅스 종료
+- reset : 초기화(터미널 자체가 리셋됨)
+- clear : 클리어(터미널 내 작성 내용을 삭제하기)
+- su - ubuntu : 계정 전환
+- exit : 계정 전환 상태에서 사용 시 계정 전환 종료.(현재 계정에서 빠져나오는 것)
+- file : 파일의 종류에 대해 알아보기
+	- 파일 종류에 대해 알게 되면 해당 파일을 사용하거나 편집하는 등의 행위를 할 수 있음
+- pwd : 내가 현재 있는 디렉터리 정보를 알려줌.
+- ls : list.
+	- window terminal에서는 dir를 의미.
+	- ls 명령어는 옵션이 상당히 많다고 한다.
+
+---
+
+root 권한은 상당히 위험하다는 것을 인지하라
+
+---
+
+ll 명령어 사용 시, 앞에 d가 있는 경우는 디렉터리를, 그 외에는 파일을 가리킨다.
+
+---
+
+리눅스를 주로 다루는 사람들은, 디렉토리 계층 구조를 외우고 있다.
+
+---
+
+System32 내 파일 : OS 관련 파일
+- window 쓸 때는 잘 모른다.
+- 자바의 경우에도 해당 파일들(.dll)을 활용하여 jvm에 전달하는 과정이 진행되는 것.
+
+---
+
+리눅스 쓰는 이유
+- tomcat, docker 등의 프로그램 관리
+
+---
+
+디렉터리
+- dev : device 
+- home : 계정 이름으로 폴더 
+- media : 외부 장치 연결
+- opt : option
+- root : root 계정의 홈 디렉터리. 루트(/) 디렉터리와는 다른 것.
+- sys : 리눅스 커널과 관련된 파일(OS 관련 파일)
+	- 리눅스 커널 : 리눅스 OS 자체를 가리키는 말로 이해하기
+	- window의 system32 폴더로 보면 된다. 
+	- .dll : 함수들의 모임. 
+- usr : Unix System Resource. 프로그램 설치할 때 여기에 많이 집어넣음.
+	- window의 program files와 동일
+- boot : 부팅에 필요한 커널 파일
+- etc : 리눅스 설정 파일. 
+- mnt :  파일 시스템을 임시로 마운트
+- tmp : 임시 데이터. 재시작하면 모두 삭제됨.
+- var : 내용이 자주 바뀌는 파일이 주로 저장됨
+
+등등이 있다.
+
+이 중 많이 건드는 디렉터리는 
+- usr
+- etc
+이다.
