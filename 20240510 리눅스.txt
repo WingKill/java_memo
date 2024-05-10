@@ -1,0 +1,118 @@
+20240510 리눅스
+
+---
+
+virtualbox ubuntu 우분투 ssh터미널 접속 설정 putty 연결 하기
+
+- https://uni.rejoice-it.com/entry/virtualbox-ubuntu-%EC%9A%B0%EB%B6%84%ED%88%AC-ssh%ED%84%B0%EB%AF%B8%EB%84%90-%EC%A0%91%EC%86%8D-%EC%84%A4%EC%A0%95-putty-%EC%97%B0%EA%B2%B0-%ED%95%98%EA%B8%B0
+
+---
+
+- root 계정으로 접속.
+
+apt-get update
+apt-get upgrade
+
+- 해당 명령어를 입력하면 리눅스는 외부에서 파일을 다운로드받아 업데이트한다.
+
+---
+
+- ifconfig
+	- window에서는 ipconfig로 쓰이는 명령어
+	- 해당 명령어는 이전에 'apt install net-tools' 명령어를 통해 설치를 진행해야 한다.
+	- 이더넷 정보를 얻기 위해 사용하는 명령어
+
+- sudo apt-get install openssh-server
+	- telnet 접속 방법이 막혔기 때문에, ssh 접속을 위해 openssh 패키지 설치 
+	- 권한이 root일 땐 sudo 명령어 생략 가능
+
+- nano /etc/ssh/sshd_config
+	- sudo vi /etc/ssh/sshd_config 나 위 명령어 중 하나를 선택하여 입력하기
+	-> 파일 열기
+	- 파일 수정
+		- 주석 해제
+			- Port 22 
+			- PermitRootLogin 값을 기존 값에서 yes로 변경 'PermitRootLogin yes'
+			- PasswordAuthentication yes
+			- KbdInteractiveAuthentication yes(이미 주석 해제된 상태인거 같지만.. 만약 안된 상태면 주석 해제하기)
+
+- sudo systemctl restart sshd
+	- 권한이 root일 땐 sudo 명령어 생략 가능
+	- Active : active(running) 부분 확인
+	- 포트번호 확인
+
+
+---
+
+22번 포트를 열고 서버가 접속하길 기다리는 상황 
+
+---
+
+이더넷 
+- 컴퓨터의 랜 카드
+
+cmd를 통해 ipconfig를 입력해보면 VM virtualbox에서 실행하는 서버도 이더넷 정보가 뜬다.
+
+---
+
+putty 다운로드
+- Alternative binary files 탭에서 putty.exe를 다운로드
+	- 64bit x86 다운로드
+
+---
+
+putty에 host name ip 입력하고 session 추가한 후 실행
+
+- 계정 접속이 되면 성공
+
+---
+
+명령어 
+
+- cp 	
+	- 파일 복사
+	- 두 인자가 파일인 경우 첫번째 파일 복사
+	- 두 번째 인자가 디렉터리인 경우 해당 경로에 파일을 복사해놓음
+	- cp -i /etc/hosts text1  : -i를 붙이면, 똑같은 파일이 있을 경우 덮어쓰는지의 여부를 체크
+	- -r : 디렉터리 복사
+
+- mv
+	- 파일 또는 디렉터리 이동, 혹은 이름 바꾸기
+	- 이름 바꾸기 (ex) mv text1 data1 )
+	- 파일명 뒤에 디렉터리명이 오면, 해당 파일을 해당 디렉터리로 이동시킴
+	- -i를 붙이고 다른 파일로 이동시키면, 덮어쓰는지 여부를 체크
+
+- rm
+	- 파일 제거
+	- -i : 제거 체크 
+	- -r : 디렉터리 삭제 시 지정. 이걸로 삭제가 안될 경우에는 -rf 활용(ex)rm -r temp2)
+
+- echo
+	- 모니터 출력 
+	- System.out.println으로 이해하자.
+	- echo "hello world" > origin : hello world라는 텍스트를 origin 파일에 입력하는 것
+
+- ls -il 
+	- 파일의 inode 번호까지 출력됨
+
+- ls -i
+	- 파일명 앞에 파일의 inode이 출력됨. inode + 파일명 형태로만 출력
+
+
+
+---
+
+리눅스 파일 구성
+- 파일명
+- inode
+- 데이터 블록
+
+
+
+- inode
+	- 해당 파일에 대한 정보를 가진 클래스
+
+
+---
+
+	
