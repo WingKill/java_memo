@@ -1,0 +1,121 @@
+20240517 리눅스
+
+---
+
+셸의 종류
+
+- 본셸(sh)
+- C셸(csh)
+- 콘셸(ksh)
+- 배시셸(bash)
+- 대시셸(dash)
+
+---
+
+- printf
+- echo
+
+---
+
+- ? 
+	- 해당 글자를 의미
+	- ls dat? 
+- [ ]
+	- 글자 중 하나 
+	- or의 의미
+	- ls data[1234] : data1, data2, data3, data4 찾기 
+	- ls data[1-4]도 동일한 표현이다. 이는 범위로 표현한 것이다.
+- * 
+	- all(모든 데이터)
+
+---
+
+-> 파일명이 영문자로 시작하고, 숫자로 끝나는 모든 파일 목록 출력
+- ls [A-Za-z]*[0-9]
+
+---
+
+- date
+	- 현재 시간 출력
+
+- ;
+	- (명령어1) ; (명령어2)
+	- 명령어 1 실행 후 명령어 2 실행
+	- 명령을 연속으로 실행시키고자 할 때 사용
+	- 
+
+---
+
+- | more
+	- ls -al 명령어처럼 실행 결과가 한 페이지를 넘어가버리는 경우
+	- ls -al | more를 해주면 한 페이지씩 확인할 수 있다.
+	- (명령 결과) | more : 명령 결과를 more에 전달. -> 페이지 단위로 출력됨.
+	- | more 에서 |는 L이 아니라 shift + \이다.
+
+```
+ubuntu@server:~$ echo '$SHELL'
+$SHELL
+ubuntu@server:~$ echo "$SHELL"
+/bin/bash
+```
+- ' 와 "는 다른 결과를 보여준다.
+	- '' 
+		- 문자열 출력
+	- " " 
+		- $(변수명1)을 이어붙여 사용
+		- 환경 변수인 변수명1에 저장된 값이 출력됨. 
+
+- env
+	- environment
+	- 
+
+- pwd
+	- print working directory
+
+---
+
+- `
+	- 명령어를 `으로 묶으면 명령어로 해석한다
+```
+ubuntu@server:~$ echo "today is `date`"
+today is 2024. 05. 17. (금) 17:09:09 KST
+```
+- \
+	- 특수 문자를 텍스트로 인식시키고자 할 때 사용
+
+```
+ubuntu@server:~$ echo "special" > d*
+-bash: d*: 모호한 리다이렉트
+ubuntu@server:~$ echo "special" > d\*
+ubuntu@server:~$ ls
+'d*'    data2      snap       temp   공개       문서       비디오   음악
+ data   hardlink   symlink2   test   다운로드   바탕화면   사진     템플릿
+
+```
+	
+---
+
+|
+	- pipe
+
+> 
+	- redirection
+
+>> 
+	- 파일 내용 추가
+
+---
+
+리눅스 OS
+
+	- 표준 입출력 장치의 파일 디스크립터
+	- standard : std
+	- stdin - 0 
+	- stdout - 1
+	- stderr - 2
+
+---
+
+
+
+
