@@ -1,0 +1,139 @@
+20240527 도커
+
+---
+
+search 
+	- 설치 파일을 찾는 명령어
+
+---
+
+docker pull oracleinanutshell/oracle-xe-11g
+
+
+hub(search) -> pull(image download) -> run(컨테이너 생성 -> 프로그램 실행)
+
+원래는 pull을 한 뒤 run을 해야 하지만,
+run 명령어를 쓰면 도커에서 자체적으로 다운로드받는다고 한다.
+
+--name을 안 주면, 알아서 도커에서 이름을 생성시킴.
+
+---
+
+oracle 설치 후 
+해당 이름을 확인하여 
+- docker ps라는 명령어를 통해 확인
+```
+root@server:~# docker ps
+CONTAINER ID   IMAGE                             COMMAND                   CREATED          STATUS          PORTS                                                         NAMES
+8b07d14c7526   oracleinanutshell/oracle-xe-11g   "/bin/sh -c '/usr/sb…"   27 minutes ago   Up 27 minutes   22/tcp, 8080/tcp, 0.0.0.0:1521->1521/tcp, :::1521->1521/tcp   boring_elgamal
+```
+컨테이너 이름이 boring_elgamal라는 것을 확인했으므로,
+```
+docker exec -it boring_elgamal /bin/bash
+```
+해당 명령어를 통해 해당 컨테이너 내부로 들어가서 sqlplus를 실행한다.
+설치가 안되어 있다면 실행이 되지 않을 것. 
+
+실행되면 기본 사용자(ID : system / PW : oracle)를 통해 접속하여 sql을 실행해보면 된다. 
+
+```
+root@server:~# docker exec -it boring_elgamal /bin/bash
+root@8b07d14c7526:/# sqlplus
+
+SQL*Plus: Release 11.2.0.2.0 Production on Mon May 27 00:52:05 2024
+
+Copyright (c) 1982, 2011, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+
+Connected to:
+Oracle Database 11g Express Edition Release 11.2.0.2.0 - 64bit Production
+
+SQL> select sysdate from dual;
+
+SYSDATE
+---------
+
+27-MAY-24
+```
+
+빠져나가려면 exit를 입력하라는데, sql> 상태가 아니라 root@8b07d14c7526 상태일 때 exit를 입력해야 다시 root로 이동.
+
+---
+---
+---
+---
+---
+---
+
+자바 람다식
+
+---
+
+람다와 스트림
+-> 객체 지향형
+-> 함수형 언어
+
+---
+
+lamda 
+람다 -> 익명 클래스
+
+---
+
+바로 인터페이스를 구현하여 사용하는 방식 -> 익명 클래스
+- 클래스이름이 없음.
+
+---
+
+```
+		Printable printable2 = new Printable() {
+			
+			@Override
+			public void print() {
+				System.out.println("프린트합니다.");
+				
+			}
+		};
+```
+
+---
+
+용도가 무엇인가? 기능은 동일하다.
+- 익명 클래스는 다른 곳에서 사용될 수 없음. 
+- 사용한 곳에서만 사용 가능.
+-> 익명 클래스는 재사용성이 없을 때 사용하는 것
+
+---
+
+람다 
+```
+		///////// 구현체
+		
+		Printable printable = new SPrint();
+		printable.print();
+		
+		///////// 익명 클래스
+		Printable printable2 = new Printable() {
+			
+			@Override
+			public void print() {
+				System.out.println("프린트합니다.2");
+				
+			}
+		};
+		printable2.print();
+		
+		//////// 람다
+		Printable prn = () -> {System.out.println("프린트합니다.3");};
+		prn.print();
+```
+
+---
+
+람다 : 화살표 함수
+-> 익명 클래스 구현 부분을 축약한 것
+
+---
+
