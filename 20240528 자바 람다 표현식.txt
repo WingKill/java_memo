@@ -1,0 +1,82 @@
+20240528 자바 람다 표현식
+
+---
+
+람다의 핵심 
+- @FunctionalInterface
+- 함수형 인터페이스
+
+함수형 인터페이스는 무조건 인터페이스 내 함수가 하나만 와야 한다.
+
+---
+
+람다 표현식 : 화살표 함수형 인터페이스
+
+---
+
+@FunctionalInterface 를 붙이지 않아도, 인터페이스 내 함수가 하나라면 람다 표현식을 사용할 수 있음.
+- 물론 해당 에너테이션을 붙이면 람다 표현식 전용이라는 것을 표현하게 되는 것.
+
+---
+
+Collections.sort() 
+- 정렬에 사용되는 메서드
+```
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+class SLenComp implements Comparator<String> {
+
+	@Override
+	public int compare(String o1, String o2) {
+		return o1.length() - o2.length();
+	}
+	
+}
+
+// 람다가 필요한 상황
+public class LamdaTest2 {
+	public static void main(String[] args) {
+		List<String> list = new ArrayList<String>();
+		list.add("Robot");
+		list.add("Lambda");
+		list.add("Box");
+		
+		Collections.sort(list, new SLenComp()); // 정렬
+		
+		for(String s : list) {
+			System.out.println(s);
+		}
+	}
+}
+```
+---
+
+자바의 단점 : 함수 자체를 전달하지는 못했음.
+- 클래스로 묶어서 전달해야 했음.
+
+---
+
+정의되어 있는 함수형 인터페이스 대표 주자들.
+
+Predicate<T> : boolean test(T t) - 전달인자를 근거로 참 또는 거짓 반환
+Supplier<T> : T get() - 메서드 호출 시 무엇인가 제공함
+Cunsumer<T> : void accept(T t) - 무엇인자를 받아들이기만 함
+Function<T,R> : R apply(T t) - 입출력 출력이 있음(수학적으로는 함수)
+
+- java.util.Function 패키지로 묶여 있음
+
+-> 람다의 핵심
+
+---
+
+Spring 생성 시 언어 선택 2가지
+- 자바
+- 코틀린
+
+- 최근에 나오는 언어들은 함수형 인터페이스를 중점으로 둠. 코틀린도 마찬가지.
+
+---
+
