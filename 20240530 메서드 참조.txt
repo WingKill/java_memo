@@ -1,0 +1,72 @@
+20240530 메서드 참조
+
+---
+
+매개변수를 참조해서 줄인다거나
+```
+		Function<String, Integer> size;
+		size = (s) -> s.length(); 
+		// 매개변수를 참조시켜서 줄이는 것.
+		size = String::length;
+		System.out.println(size.apply("hello"));
+```
+생성자의 매서드 참조도 가능
+```
+class B{
+	B(int x, int y){
+		System.out.println(x+y);
+	}
+}
+
+public class LamdaTest2 {
+	public static void main(String[] args) {
+		BiFunction<Integer, Integer, Object> constructor;
+		constructor = (x,y) -> new B(x,y);
+		constructor = B::new;
+		
+		constructor.apply(10, 20);
+	}
+}
+```
+---
+
+스트림
+
+---
+
+파이썬, 빅데이터를 쓰게 되면 스트림을 사용하게 된다고 한다.
+- 타 언어와 문법은 동일하다고 한다.
+
+---
+
+스트림
+- IO 스트림과는 전혀 다른 개념
+- '중간 연산'과 '최종 연산'을 진행
+- 데이터 소스 -> 중간 연산(필터) -> 중개 연산(앱) -> 최종 연산
+
+---
+
+스트림의 중간 처리 함수
+스트림의 최종 연산 함수
+
+---
+
+병렬 처리가 가능하기 때문에 스트림이 떴다고 한다.
+
+---
+
+스트림은 1회성이라는 것이 특징이다.
+- 한 번 사용하고 나면 다시 스트림 객체를 생성해줘야 한다.
+
+---
+
+중간 처리 함수 
+- 호출 위치가 중간에 위치하기 때문에 일컬어지는 함수 -> 데이터 조건을 걸기 위해서
+-> 중간 연산이 오게 되면, 최종 연산을 해줘야 한다.
+
+최종 연산 함수
+- 끝에 위치해야 하는 함수
+-> 호출 시점이 마지막이 아니라면 오류가 난다.
+
+---
+
