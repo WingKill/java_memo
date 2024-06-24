@@ -1,0 +1,59 @@
+20240624 에러보고서
+
+---
+
+다중 차트 만드는데 시간 보냄.
+
+차트 옵션 설정에서 데이터 조절하는 것 -> 실패
+
+데이터셋에 type 값 정하고  차트 옵션에서는 왼쪽, 오른쪽 설정만 조정 -> 성공
+
+이거 하는거까진 1시간 안 걸린 거 같은데, 이후 재 디자인과 요소 뭘 놓을지 고민하는 부분에서 몇시간 날려먹은 느낌.
+
+---
+
+```
+// 차트 옵션 설정
+        let options = {
+          responsive: true,
+          scales: {
+            // 기존 1개만 보여주는 방식과 동일
+            // y: {
+            //   beginAtZero: true
+            // }
+            
+            // //Chart.js 2.x 버전
+            // // yAxes: [{
+            // //   id: 'day-totalSales',
+            // //   type: 'linear',
+            // //   position: 'left',
+            // //   ticks: {
+            // //     beginAtZero: true
+            // //   }
+            // // }, {
+            // //   id: 'day-purchaseCount',
+            // //   type: 'linear',
+            // //   position: 'right',
+            // //   ticks: {
+            // //     beginAtZero: true
+            // //   }
+            // // }]
+
+            //Chart.js 3.x 버전
+            dayTotalSales: {
+              position: 'left',
+              ticks: {
+                beginAtZero: true
+              }
+            }, 
+
+            //3.x 버전에서는 막대 그래프를 구현할 때 데이터셋에 backgroundColor와 borderColor 속성을 설정하여 막대 그래프를 표현
+            dayPurchaseCount: {              
+              position: 'right',
+              ticks: {
+                beginAtZero: true
+              },
+            }
+          }
+        };
+```
