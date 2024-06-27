@@ -1,0 +1,19 @@
+20240627 ChatGPT-api를 활용한 챗봇 구현
+
+---
+
+파이썬은 10줄 쓰면 됨.
+
+html 20줄, java 50줄 정도 요구
+
+---
+
+openai 사이트 접속 - dashboard - api keys - view user API keys 
+-> API 추가할 때 사용
+-> API KEY를 추가할 때 해당 부분을 통해 이동하여 추가
+
+- 해당 부분을 활용하려면 요금을 내야 한다.
+- 현재는 선생님이 만드신 openAI를 활용하여 진행할 예정
+
+---
+
