@@ -1,0 +1,11 @@
+// 클릭 이벤트 강제하기
+// 클릭 이벤트 강제 시 주의사항 : 클릭 이벤트를 일반적으로 실행해버리면, 
+클릭 시 기본 이벤트 또한 실행시켜서 화면 새로고침이 발생함.
+이를 막기 위해서는 기본 동작을 막고 강제 실행을 해야 기본 이벤트 실행이 되지 않는다.
+
+$(document).on('keypress', 'input[name="keyword"]', function(e) {
+    if (e.which === 13) { // 13은 엔터 키의 keyCode입니다
+	e.preventDefault();
+        $('#vendor-searchBtn').trigger('click'); // 검색 버튼 클릭 이벤트 강제 발생
+    }
+});
